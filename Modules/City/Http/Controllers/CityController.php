@@ -14,10 +14,13 @@ class CityController extends Controller
     /**
     * Display a listing of the resource.
     */
-    public function index()
+    public function list()
     {
 
-        $cities = City::all();
+        $cities = City::query()
+            ->select('id', 'name')
+            ->where('is_active', 1)
+            ->get();
 
         return CityResource::collection($cities);
     }

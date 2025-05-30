@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
 //        User::factory()->count(10000)->create();
         Tag::factory()->count(1000)->create();
         BlogCategory::factory()->count(10)->create();
-        Blog::factory()->count(1000)->create();
+        Blog::factory()->count(50)->create();
 
 
     }

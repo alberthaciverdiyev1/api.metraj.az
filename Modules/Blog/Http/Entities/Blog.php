@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Base\Traits\Slug;
+use Modules\Blog\Database\Factories\BlogFactory;
 use Modules\Blog\Http\Traits\BlogRelations;
 
 class Blog extends Model
@@ -39,8 +40,8 @@ class Blog extends Model
     protected $casts = [
 
     ];
-//    public static function newFactory(): BlogFactory
-//    {
-//        return BlogFactory::new();
-//    }
+    public static function newFactory(): BlogFactory
+    {
+        return BlogFactory::new();
+    }
 }

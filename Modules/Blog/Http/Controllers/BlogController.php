@@ -75,7 +75,6 @@ class BlogController extends Controller
      */
     public function store(BlogStoreRequest $request): JsonResponse
     {
-
         try {
             $validatedData = $request->safe()->toArray();
 
@@ -94,11 +93,11 @@ class BlogController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(string $slug ,BlogUpdateRequest $request)
+    public function update(string $slug, BlogUpdateRequest $request)
     {
         try {
             $validatedData = $request->safe()->toArray();
-            $validatedData['slug'] = Str::slug($validatedData['name']) .'-'.rand(10,1000000);
+            $validatedData['slug'] = Str::slug($validatedData['name']) . '-' . rand(10, 1000000);
 
             $updated = Blog::query()->where('slug', $slug)->update($validatedData);
             if ($updated) {
