@@ -16,7 +16,6 @@ use Modules\Blog\Http\Controllers\TagController;
 */
 
 
-Route::domain(config('app.api_url'))->group(function () {
     Route::controller(BlogController::class)->group(function () {
         Route::get('blog', 'blogs')->name('blog.list');
         Route::get('blog/{slug}', 'blog')->name('blog.details');
@@ -28,7 +27,6 @@ Route::domain(config('app.api_url'))->group(function () {
     Route::controller(TagController::class)->group(function () {
         Route::get('tag', 'tags')->name('tag.list');
     });
-});
 
 //Route::middleware('auth:api')->group(function () {
 //    Route::resource('/blog', \Modules\Blog\Http\Controllers\BlogController::class);
