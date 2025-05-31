@@ -3,9 +3,15 @@
 namespace Modules\Town\Http\Controllers;
 
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
 use Modules\Town\Http\Entities\Town;
+use Modules\Town\Http\Requests\TownStoreRequest;
+use Modules\Town\Http\Requests\TownUpdateRequest;
+use Modules\Town\Http\Transformers\TownResource;
 use Nwidart\Modules\Facades\Module;
 
 class TownController extends Controller
@@ -27,61 +33,83 @@ class TownController extends Controller
     /**
     * Display a listing of the resource.
     */
-    public function list()
+    public function list(): AnonymousResourceCollection
     {
-        $towns = Town::with('district')->get();
-        return $towns;
+        $blogs = Town::query()
+            ->select('id', 'name', 'slug', 'district_id')
+            ->with([
+                'city:id,name,slug,district_id',
+                'district:id,name,slug'
+            ])
+            ->latest()
+            ->get();
+
+        return TownResource::collection($blogs);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function details(string $slug)
     {
-        return view('town::create');
+//        $blog = District::query()
+//            ->select('id', 'name', 'slug', 'city_id')
+//            ->with([
+//                'category:id,name,slug',
+//                'tags:id,name,slug'
+//            ])
+//            ->where('slug', $slug)
+//            ->first();
+//
+//        if (!$blog) {
+//            return response()->json([
+//                'success' => 400,
+//                'message' => __('Blog not found!')
+//            ]);
+//        }
+//
+//        return BlogDetailsResource::make($blog);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(TownStoreRequest $request): JsonResponse
     {
         try {
+            $validatedData = $request->safe()->toArray();
 
-            //TODO:STORE FUNCTIONS
+            Town::query()->create($validatedData);
 
-            return response()->json(__('Data successfully created!'));
+            return response()->json([
+                'message' => 'District created successfully.',
+                'status_code' => 201
+            ]);
         } catch (Exception $e) {
             return response()->json($e->getMessage());
         }
     }
 
-    /**
-     * Show the specified resource.
-     */
-    public function show()
-    {
-        return view('town::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit()
-    {
-        return view('town::edit');
-    }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(string $slug, TownUpdateRequest $request)
     {
         try {
+            $validatedData = $request->safe()->toArray();
+            $validatedData['slug'] = Str::slug($validatedData['name']) . '-' . rand(10, 1000000);
 
-            //TODO:UPDATE FUNCTIONS
+            $updated = Town::query()->where('slug', $slug)->update($validatedData);
+            if ($updated) {
+                return response()->json([
+                    'message' => 'Town updated successfully.',
+                    'status_code' => 201
+                ]);
+            } else {
+                return response()->json([
+                    'message' => 'Town not found or no changes detected.',
+                    'status_code' => 404
+                ]);
+            }
 
-            return response()->json(__('Data successfully updated!'));
         } catch (Exception $e) {
             return response()->json($e->getMessage());
         }
@@ -90,15 +118,17 @@ class TownController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy()
+    public function destroy(string $slug): JsonResponse
     {
         try {
-
-            //TODO:DESTROY FUNCTIONS
-
-            return response()->json(__('Data successfully deleted!'));
+            District::query()->where('slug', $slug)->delete();
+            return response()->json([
+                'message' => 'District deleted successfully.',
+                'status_code' => 200
+            ]);
         } catch (Exception $e) {
             return response()->json($e->getMessage());
         }
     }
+
 }
