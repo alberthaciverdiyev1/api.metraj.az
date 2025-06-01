@@ -2,12 +2,14 @@
 
 namespace Modules\Property\Http\Entities;
 
+use Database\Factories\PropertyFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Property extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasFactory;
 
     /**
      * The table associated with the model.
@@ -106,5 +108,9 @@ class Property extends Model
     public function media()
     {
         return $this->morphMany(\Modules\Media\Http\Entities\Media::class, 'imageable');
+    }
+    public static function newFactory(): PropertyFactory
+    {
+        return PropertyFactory::new();
     }
 }

@@ -2,12 +2,15 @@
 
 namespace Modules\Realtor\Http\Entities;
 
+use Database\Factories\RealtorFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\User\Http\Entities\User;
 
 class Realtor extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes,HasFactory;
 
     /**
      * The table associated with the model.
@@ -58,7 +61,7 @@ class Realtor extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function city()
@@ -84,5 +87,9 @@ class Realtor extends Model
     public function properties()
     {
         return $this->hasMany(\Modules\Property\Http\Entities\Property::class, 'realtor_id');
+    }
+    public static function newFactory(): RealtorFactory
+    {
+        return RealtorFactory::new();
     }
 }

@@ -6,6 +6,7 @@ use Database\Factories\SubwayFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Property\Http\Entities\Property;
 
 class Subway extends Model
 {
