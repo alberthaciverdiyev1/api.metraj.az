@@ -42,6 +42,6 @@ class DatabaseSeeder extends Seeder
         Realtor::factory()->count(10)->create();
 
         Property::factory()->count(100)->create();
-        
+
     }
 }

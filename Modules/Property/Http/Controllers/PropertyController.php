@@ -5,6 +5,7 @@ namespace Modules\Property\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Property\Http\Transformers\PropertyListResource;
 use Nwidart\Modules\Facades\Module;
 use Modules\Property\Http\Entities\Property;
 class PropertyController extends Controller
@@ -26,13 +27,26 @@ class PropertyController extends Controller
     /**
     * Display a listing of the resource.
     */
-    public function list()
+    public function list(Request $request)
     {
-        $properties = Property::with([
-            'city','town','district','subway','user','realtor','media'
-        ])->get();
-        return $properties;
+        $with = explode(',', $request->query('with', ''));
+
+        $allowedRelations = ['city', 'town', 'district', 'subway', 'user', 'realtor', 'media'];
+        $relations = array_intersect($with, $allowedRelations);
+
+        $query = Property::query();
+
+        if (!empty($relations)) {
+            $query->with($relations);
+        }
+
+        $limit = $request->query('limit', config('default.default_property_limit'));
+
+        $properties = $query->paginate($limit);
+
+        return PropertyListResource::collection($properties);
     }
+
 
 
     public function add(Request $request)
