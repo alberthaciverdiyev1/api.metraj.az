@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('features', [\Modules\Feature\Http\Controllers\FeatureController::class, 'index']);
+Route::get('feature', [\Modules\Feature\Http\Controllers\FeatureController::class, 'index']);
 
 //Route::middleware('auth:api')->group(function () {
 //    Route::resource('/{feature}', \Modules\{Feature}\Http\Controllers\{Feature}Controller::class);
