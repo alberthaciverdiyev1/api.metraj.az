@@ -16,19 +16,6 @@ use \Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class BlogController extends Controller
 {
 
-    public function __construct()
-    {
-//        if (Module::find('Roles')->isEnabled()) {
-//            $this->middleware('permission:view blogs')->only('index');
-//            $this->middleware('permission:create blog')->only('create');
-//            $this->middleware('permission:store blog')->only('store');
-//            $this->middleware('permission:edit blog')->only('edit');
-//            $this->middleware('permission:update blog')->only('update');
-//            $this->middleware('permission:destroy blog')->only('destroy');
-//        }
-    }
-
-
     /**
      * Display a listing of the resource.
      */

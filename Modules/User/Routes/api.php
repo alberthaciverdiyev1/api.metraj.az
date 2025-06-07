@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Modules\User\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,12 @@ use Illuminate\Http\Request;
 */
 
 Route::get('user', [\Modules\User\Http\Controllers\UserController::class, 'list']);
+
+Route::controller(UserController::class)->group(function () {
+    Route::post('register', 'register');
+//    Route::post('login', 'login');
+//    Route::post('logout', 'logout');
+});
 
 //Route::middleware('auth:api')->group(function () {
 //    Route::resource('/user', \Modules\User\Http\Controllers\UserController::class);
