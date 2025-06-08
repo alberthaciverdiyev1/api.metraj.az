@@ -20,10 +20,13 @@ Route::get('user', [\Modules\User\Http\Controllers\UserController::class, 'list'
 Route::controller(UserController::class)->group(function () {
     Route::post('register', 'register');
     Route::post('login', 'login');
-//    Route::post('logout', 'logout');
 });
 
-//Route::middleware('auth:api')->group(function () {
-//    Route::resource('/user', \Modules\User\Http\Controllers\UserController::class);
-//});
+Route::middleware('auth:api')->group(function () {
+    Route::post('logout', [\Modules\User\Http\Controllers\UserController::class, 'logout']);
+    Route::get('test', function (Request $request) {
+        return auth()->user();
+    });
+
+});
 
