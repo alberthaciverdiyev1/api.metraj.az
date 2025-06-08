@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Modules\User\Http\Requests\LoginRequest;
 use Modules\User\Http\Requests\RegisterRequest;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Modules\User\Http\Entities\User;
@@ -35,12 +36,13 @@ class UserController extends Controller
         ]);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
+
         $credentials = $request->only('email', 'password');
 
         if (!$token = JWTAuth::attempt($credentials)) {
-            return response()->json(['status' => 401, 'message' => 'Invalid credentials']);
+            return response()->json(['status' => 401, 'message' => 'Email or Password is invalid']);
         }
 
         $user = auth()->user();

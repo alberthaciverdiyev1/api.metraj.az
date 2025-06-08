@@ -19,7 +19,7 @@ Route::get('user', [\Modules\User\Http\Controllers\UserController::class, 'list'
 
 Route::controller(UserController::class)->group(function () {
     Route::post('register', 'register');
-//    Route::post('login', 'login');
+    Route::post('login', 'login');
 //    Route::post('logout', 'logout');
 });
 
