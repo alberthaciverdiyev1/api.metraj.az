@@ -20,9 +20,8 @@ class CityController extends Controller
      */
     public function list()
     {
-        $cities = City::query()
-            ->select('id', 'name')
-            ->where('is_active', 1)
+        $cities = City::with(['districts.towns'])
+        ->where('is_active', true)
             ->get();
 
         return CityResource::collection($cities);

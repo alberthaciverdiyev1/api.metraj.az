@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\City\Database\Factories\CityFactory;
+use Modules\District\Http\Entities\District;
 
 class City extends Model
 {
@@ -26,6 +27,11 @@ class City extends Model
     protected static function newFactory(): CityFactory
     {
         return CityFactory::new();
+    }
+
+    public function districts()
+    {
+        return $this->hasMany(District::class);
     }
 
 }
