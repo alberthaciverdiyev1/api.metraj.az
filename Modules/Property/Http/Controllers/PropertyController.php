@@ -29,23 +29,46 @@ class PropertyController extends Controller
     */
     public function list(Request $request)
     {
-        $with = explode(',', $request->query('with', ''));
+        $relations = $request->query('with', []);
+        $query     = Property::query()->when($relations, fn ($q) => $q->with($relations));
 
-        $allowedRelations = ['city', 'town', 'district', 'subway', 'user', 'realtor', 'media'];
-        $relations = array_intersect($with, $allowedRelations);
+        $map = [
+            'type'            => 'type',
+            'add_no'          => 'add_no',
+            'town_id'         => 'town_id',
+            'subway_id'       => 'subway_id',
+            'district_id'     => 'district_id',
+            'city_id'         => 'city_id',
+            'property_type'   => 'property_type',
+            'add_type'        => 'add_type',
+            'number_of_floors'=> 'number_of_floors',
+            'number_of_rooms' => 'number_of_rooms',
+            'floor_located'   => 'floor_located',
+            'in_credit'       => 'in_credit',
+        ];
 
-        $query = Property::query();
-
-        if (!empty($relations)) {
-            $query->with($relations);
+        foreach ($map as $param => $column) {
+            if ($request->filled($param)) {
+                $query->where($column, $request->query($param));
+            }
         }
 
-        $limit = $request->query('limit', config('default.default_property_limit'));
+        foreach (['area', 'field_area'] as $rangeParam) {
+            if ($request->has("$rangeParam.min") || $request->has("$rangeParam.max")) {
+                $query->whereBetween($rangeParam, [
+                    $request->input("$rangeParam.min", 0),
+                    $request->input("$rangeParam.max", PHP_INT_MAX)
+                ]);
+            }
+        }
 
-        $properties = $query->paginate($limit);
+        $limit      = $request->integer('limit', config('default.default_property_limit'));
+        $properties = $query->paginate($limit)->appends($request->query());
 
-        return PropertyListResource::collection($properties);
+        return PropertyListResource::collection($properties)
+ ;
     }
+
 
 
 
