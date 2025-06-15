@@ -26,7 +26,7 @@ class PropertyFactory extends Factory
             'district_id' => District::inRandomOrder()->first()->id,
             'city_id' => City::inRandomOrder()->first()->id,
             'address' => $this->faker->address(),
-            'property_type' => $this->faker->randomElement(['for-sale', 'for-rent']),
+            'property_type' => $this->faker->randomElement(['sale', 'rent']),
             'add_type' => $this->faker->name(),
             'number_of_floors' => $this->faker->randomNumber(),
             'number_of_rooms' => $this->faker->randomNumber(),

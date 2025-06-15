@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Modules\Property\Http\Controllers\PropertyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,7 @@ use Illuminate\Http\Request;
 */
 
 Route::get('property', [\Modules\Property\Http\Controllers\PropertyController::class, 'list']);
+Route::get('property/{id}', [PropertyController::class, 'details']);
 
 
 

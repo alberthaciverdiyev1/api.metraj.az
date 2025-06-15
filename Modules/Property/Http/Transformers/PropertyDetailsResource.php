@@ -4,6 +4,7 @@ namespace Modules\Property\Http\Transformers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use function Symfony\Component\Translation\t;
 
 class PropertyDetailsResource extends JsonResource
 {
@@ -13,23 +14,16 @@ class PropertyDetailsResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'name' => $this->name,
+            'title' => $this->number_of_rooms . ' otaqlı ' . $this->subway->name ?? $this->district->name,
+            'price' => '400',
+            'add_no' => $this->add_no,
             'slug' => $this->slug,
+            'address' => $this->address,
             'description' => $this->description,
-            'author' => $this->author_name,
             'date' => \Carbon\Carbon::parse($this->getAttribute('date'))->format('d F, Y'),
+            'area' => $this->area,
+            'field_area' => $this->field_area,
 
-            'category' => [
-                'name' => $this->category?->name,
-                'slug' => $this->category?->slug,
-            ],
-
-            'tags' => $this->tags->map(function ($tag) {
-                return [
-                    'name' => $tag->name,
-                    'slug' => $tag->slug,
-                ];
-            }),
 //            'image'=>$this->image()
             'images' => [
                 'https://themesflat.co/html/proty/images/blog/blog-grid-1.jpg',
@@ -37,14 +31,57 @@ class PropertyDetailsResource extends JsonResource
                 'https://themesflat.co/html/proty/images/blog/blog-grid-3.jpg',
                 'https://themesflat.co/html/proty/images/blog/blog-grid-4.jpg',
             ],
-            'content' => [
-                "The housing sector has long been a focal point for investors seeking stability and growth. Understanding the dynamics of housing stocks and effectively trading within this sector can lead to substantial gains.",
-                "Understanding Housing Stocks: Housing stocks encompass companies involved in various aspects of the real estate industry, including homebuilders, developers, and related service providers. Factors influencing these stocks range from interest rates and economic indicators to trends in homeownership rates.",
-                "Pay close attention to economic indicators such as employment rates, GDP growth, and consumer confidence. A strong economy often correlates with increased demand for housing, benefiting related stocks.",
-                "Identify Emerging Trends: Stay informed about emerging trends in the housing market, such as the demand for sustainable homes, technological advancements, and demographic shifts. Companies aligning with these trends may present attractive investment opportunities.",
-                "Take a long-term investment approach if you believe in the stability and growth potential of the housing sector. Look for companies with solid fundamentals and a track record of success. For short-term traders, capitalize on market fluctuations driven by economic reports, interest rate changes, or industry-specific news. Keep a close eye on earnings reports and government housing data releases."
-            ]
 
+            'video' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
+            'document' => 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+
+            'property_type' => $this->property_type,
+            'add_type' => $this->add_type,
+            'number_of_floors' => $this->number_of_floors,
+            'number_of_rooms' => $this->number_of_rooms,
+            'floor_located' => $this->floor_located,
+            'advertiser' => $this->advertiser,
+            'advertiser_name' => $this->advertiser_name,
+            'phone_1' => $this->phone_1,
+            'phone_2' => $this->phone_2,
+            'phone_3' => $this->phone_3,
+            'phone_4' => $this->phone_4,
+            'mail' => $this->mail,
+            'in_credit' => $this->in_credit,
+            'note_to_admin' => $this->note_to_admin,
+            'building_type' => $this->building_type,
+            'has_video' => $this->has_video,
+            'is_active' => $this->is_active,
+            'is_premium' => $this->is_premium,
+            'features' => ["test", 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test'],
+            'location' => [
+                //            'town_id',
+//            'subway_id',
+//            'district_id' => ,
+//            'city_id',
+                'google_map_location' => $this->google_map_location ?? null,
+                'address' => $this->address ?? 'Not specified',
+
+            ],
+            'virtual_tour' => [
+                'link' => 'https://www.youtube.com/embed/MLpWrANjFbI',
+                'image' => 'https://themesflat.co/html/proty/images/section/property-detail-2.jpg',
+            ],
+            'nearby_objects' => [
+                ['range' => '1km',
+                    'name' => 'Araz Market'
+                ],
+                [
+                    'range' => '100m',
+                    'name' => 'Bravo Supermarket'
+                ],
+                [
+                    'range' => '1km',
+                    'name' => 'Inshaatcilar m-su'
+                ]
+            ],
+//            'user_id' ,
+//            'realtor_id',
         ];
     }
 }

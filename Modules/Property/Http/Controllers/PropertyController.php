@@ -5,9 +5,11 @@ namespace Modules\Property\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Property\Http\Transformers\PropertyDetailsResource;
 use Modules\Property\Http\Transformers\PropertyListResource;
 use Nwidart\Modules\Facades\Module;
 use Modules\Property\Http\Entities\Property;
+
 class PropertyController extends Controller
 {
 
@@ -25,33 +27,21 @@ class PropertyController extends Controller
 
 
     /**
-    * Display a listing of the resource.
-    */
+     * Display a listing of the resource.
+     */
     public function list(Request $request)
     {
         $relations = $request->query('with', []);
-        $query     = Property::query()->when($relations, fn ($q) => $q->with($relations));
+        $query = Property::query()->when($relations, fn($q) => $q->with($relations));
 
-        $map = [
-            'type'            => 'type',
-            'add_no'          => 'add_no',
-            'town_id'         => 'town_id',
-            'subway_id'       => 'subway_id',
-            'district_id'     => 'district_id',
-            'city_id'         => 'city_id',
-            'property_type'   => 'property_type',
-            'add_type'        => 'add_type',
-            'number_of_floors'=> 'number_of_floors',
-            'number_of_rooms' => 'number_of_rooms',
-            'floor_located'   => 'floor_located',
-            'in_credit'       => 'in_credit',
+        $params = [
+            'property_type' => $request->query('property-type')
         ];
 
-        foreach ($map as $param => $column) {
-            if ($request->filled($param)) {
-                $query->where($column, $request->query($param));
-            }
+        if ($params['property_type']) {
+            $query = $query->where('property_type', $params['property_type']);
         }
+
 
         foreach (['area', 'field_area'] as $rangeParam) {
             if ($request->has("$rangeParam.min") || $request->has("$rangeParam.max")) {
@@ -62,27 +52,22 @@ class PropertyController extends Controller
             }
         }
 
-        $limit      = $request->integer('limit', config('default.default_property_limit'));
+        $limit = $request->integer('limit', config('default.default_property_limit'));
         $properties = $query->paginate($limit)->appends($request->query());
 
-        return PropertyListResource::collection($properties)
- ;
+        return PropertyListResource::collection($properties);
     }
 
 
-
-
-    public function add(Request $request)
+    public function details($id)
     {
-        try {
-
-            Property::create();
-
-            return response()->json(__('Data successfully created!'));
-        } catch (Exception $e) {
-            return response()->json($e->getMessage());
-        }
+        $property = Property::query()
+            ->where('id', $id)
+            ->with(['city', 'district', 'subway'])
+            ->firstOrFail();
+        return new PropertyDetailsResource($property);
     }
+
 
     /**
      * Show the specified resource.
