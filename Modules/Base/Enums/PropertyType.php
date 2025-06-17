@@ -2,16 +2,16 @@
 
 namespace Modules\Base\Enums;
 
-enum PropertyType: int
+enum PropertyType: string
 {
-    case APARTMENT = 0x001;
-    case NEW_BUILDING = 0x002;
-    case OLD_BUILDING = 0x003;
-    case COUNTRY_OR_YARD_HOUSE = 0x004;
-    case OFFICE = 0x005;
-    case GARAGE = 0x006;
-    case LAND = 0x007;
-    case OBJECT = 0x008;
+    case APARTMENT = '0x001';
+    case NEW_BUILDING = '0x002';
+    case OLD_BUILDING = '0x003';
+    case COUNTRY_OR_YARD_HOUSE = '0x004';
+    case OFFICE = '0x005';
+    case GARAGE = '0x006';
+    case LAND = '0x007';
+    case OBJECT = '0x008';
 
 
 

@@ -12,10 +12,16 @@ class DistrictFactory extends Factory
 
     public function definition(): array
     {
+        $azerbaijanDistricts = [
+            'Binəqədi', 'Nərimanov', 'Nizami', 'Xətai', 'Yasamal',
+            'Səbail', 'Sabunçu', 'Suraxanı', 'Qaradağ', 'Nəsimi',
+            'Abşeron'
+        ];
+
         return [
             'slug' => $this->faker->unique()->slug,
-            'name' => $this->faker->city,
-            'city_id' => City::inRandomOrder()->first()->id,
+            'name' => $this->faker->unique()->randomElement($azerbaijanDistricts),
+            'city_id' => City::inRandomOrder()->first()?->id ?? 1,
         ];
     }
 }

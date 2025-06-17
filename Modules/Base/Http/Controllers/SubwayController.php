@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Base\Http\Entities\Subway;
+use Modules\Base\Http\Transformers\SubwayResource;
 use Nwidart\Modules\Facades\Module;
 
 class SubwayController extends Controller
@@ -17,7 +18,7 @@ class SubwayController extends Controller
     public function list()
     {
         $subways = Subway::all();
-        return $subways ;
+        return SubwayResource::collection($subways);
     }
 
     /**

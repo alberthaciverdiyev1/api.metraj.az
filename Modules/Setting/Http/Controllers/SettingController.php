@@ -5,6 +5,8 @@ namespace Modules\Setting\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Setting\Http\Requests\SettingRequest;
+use Modules\Setting\Http\Transformers\SettingResource;
 use Nwidart\Modules\Facades\Module;
 use Modules\Setting\Http\Entities\Setting;
 
@@ -25,79 +27,23 @@ class SettingController extends Controller
 
 
     /**
-    * Display a listing of the resource.
-    */
-    public function list()
+     * Display a listing of the resource.
+     */
+    public function getData()
     {
-        return Setting::first();
+        return SettingResource::make(Setting::query()->first());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('setting::create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function setData(SettingRequest $request)
     {
         try {
-
-            //TODO:STORE FUNCTIONS
-
-            return response()->json(__('Data successfully created!'));
+            $validated = $request->validated();
+            $setting = Setting::query()->first();
+            $setting->update($validated);
+            return response()->json(__('Setting successfully updated!'));
         } catch (Exception $e) {
             return response()->json($e->getMessage());
         }
     }
 
-    /**
-     * Show the specified resource.
-     */
-    public function show()
-    {
-        return view('setting::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit()
-    {
-        return view('setting::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request)
-    {
-        try {
-
-            //TODO:UPDATE FUNCTIONS
-
-            return response()->json(__('Data successfully updated!'));
-        } catch (Exception $e) {
-            return response()->json($e->getMessage());
-        }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy()
-    {
-        try {
-
-            //TODO:DESTROY FUNCTIONS
-
-            return response()->json(__('Data successfully deleted!'));
-        } catch (Exception $e) {
-            return response()->json($e->getMessage());
-        }
-    }
 }

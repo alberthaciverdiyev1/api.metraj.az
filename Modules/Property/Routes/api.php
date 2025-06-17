@@ -16,6 +16,7 @@ use Modules\Property\Http\Controllers\PropertyController;
 
 Route::get('property', [\Modules\Property\Http\Controllers\PropertyController::class, 'list']);
 Route::get('property/{id}', [PropertyController::class, 'details']);
+Route::post('property', [PropertyController::class, 'add']);
 
 
 

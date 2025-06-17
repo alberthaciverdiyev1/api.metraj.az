@@ -12,10 +12,18 @@ class TownFactory extends Factory
 
     public function definition(): array
     {
+        $azerbaijanTowns = [
+            'Biləcəri', 'Əhmədli', 'Hövsan', 'Binə', 'Zabrat',
+            'Kürdəxanı', 'Masazır', 'Xırdalan', 'Sarayevo', 'Buzovna',
+            'Qala', 'Məmmədli', 'Nardaran', 'Novxanı', 'Sumqayıt qəsəbəsi',
+            'Lökbatan', 'Qobustan', 'Şamaxı kəndi', 'Sabunçu kəndi', 'Zirə',
+            'Türkan', 'Pirallahı', 'Qalaaltı', 'Qobustan kəndi', 'Hacıqabul'
+        ];
+
         return [
             'slug' => $this->faker->unique()->slug,
-            'name' => $this->faker->city,
-            'district_id' => District::inRandomOrder()->first()->id,
+            'name' => $this->faker->unique()->randomElement($azerbaijanTowns),
+            'district_id' => District::inRandomOrder()->first()?->id ?? 1,
         ];
     }
 }

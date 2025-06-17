@@ -5,6 +5,14 @@ namespace Modules\Property\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
+use Modules\Base\Enums\Currency;
+use Modules\Base\Enums\PropertyType;
+use Modules\Base\Helpers\Enum;
+use Modules\Price\Http\Entities\Price;
+use Symfony\Component\HttpFoundation\Response;
+use Modules\Base\Enums\RepairType;
+use Modules\Property\Http\Requests\StoreProperty;
 use Modules\Property\Http\Transformers\PropertyDetailsResource;
 use Modules\Property\Http\Transformers\PropertyListResource;
 use Nwidart\Modules\Facades\Module;
@@ -34,14 +42,19 @@ class PropertyController extends Controller
         $relations = $request->query('with', []);
         $query = Property::query()->when($relations, fn($q) => $q->with($relations));
 
-        $params = [
-            'property_type' => $request->query('property-type')
-        ];
 
-        if ($params['property_type']) {
-            $query = $query->where('property_type', $params['property_type']);
+        if ($request->query('property-condition')) {
+            $query = $query->where('property_condition', Enum::check(RepairType::class, $request->query('property-condition')));
         }
-
+        if ($request->query('property-type')) {
+            $query = $query->where('add_type', $request->query('property-type'));
+        }
+        if ($request->query('building-type')) {
+            $query = $query->where('building_type', Enum::check(PropertyType::class, $request->query('building-type')));
+        }
+        if ($request->query('room-count')) {
+            $query = $query->where('number_of_rooms', (integer)$request->query('room-count'));
+        }
 
         foreach (['area', 'field_area'] as $rangeParam) {
             if ($request->has("$rangeParam.min") || $request->has("$rangeParam.max")) {
@@ -68,50 +81,27 @@ class PropertyController extends Controller
         return new PropertyDetailsResource($property);
     }
 
-
-    /**
-     * Show the specified resource.
-     */
-    public function show()
+    public function add(StoreProperty $request)
     {
-        return view('property::show');
+        $validated = $request->validated();
+
+        $validated['property_condition'] = Enum::check(RepairType::class, $validated['property_condition']);
+        $validated['building_type'] = Enum::check(PropertyType::class, $validated['building_type']);
+
+        $validated['slug'] = Str::random(20);
+
+        $price = $validated['price'] ?? null;
+        unset($validated['price']);
+
+        $property = Property::create($validated);
+
+        Price::create([
+            'property_id' => $property->id,
+            'price' => $price,
+            'currency' => Enum::check(Currency::class, 'AZN'),
+        ]);
+
+        return new PropertyDetailsResource($property);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit()
-    {
-        return view('property::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request)
-    {
-        try {
-
-            //TODO:UPDATE FUNCTIONS
-
-            return response()->json(__('Data successfully updated!'));
-        } catch (Exception $e) {
-            return response()->json($e->getMessage());
-        }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy()
-    {
-        try {
-
-            //TODO:DESTROY FUNCTIONS
-
-            return response()->json(__('Data successfully deleted!'));
-        } catch (Exception $e) {
-            return response()->json($e->getMessage());
-        }
-    }
 }

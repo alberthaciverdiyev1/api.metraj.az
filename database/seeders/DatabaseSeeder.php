@@ -27,12 +27,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-        City::factory()->count(100)->create();
-        Feature::factory()->count(100)->create();
-        District::factory()->count(100)->create();
+        City::factory()->count(10)->create();
+        Feature::factory()->count(30)->create();
+        District::factory()->count(10)->create();
         Indicator::factory()->count(100)->create();
-        Subway::factory()->count(100)->create();
-        Town::factory()->count(100)->create();
+        Subway::factory()->count(20)->create();
+        Town::factory()->count(10)->create();
         Setting::factory()->count(1)->create();
         Keyword::factory()->count(10)->create();
         User::factory()->count(10)->create();

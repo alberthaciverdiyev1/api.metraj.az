@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('district_id')->nullable()->constrained('districts')->nullOnDelete();
             $table->foreignId('city_id')->nullable()->constrained('cities')->nullOnDelete();
             $table->string('address')->nullable();
-            $table->string('property_type')->nullable();
+            $table->string('property_condition')->nullable();
             $table->string('add_type')->nullable();
             $table->integer('number_of_floors')->nullable();
             $table->integer('number_of_rooms')->nullable();

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('prices', function (Blueprint $table) {
             $table->id();
-            $table->float('amount');
+            $table->float('price');
             $table->string('currency')->default('AZN');
             $table->foreignId('property_id')->nullable()->constrained('properties')->nullOnDelete();
             $table->timestamps();

@@ -10,8 +10,8 @@ class Price extends Model
 {
     use HasFactory,SoftDeletes;
     protected $fillable = [
-        'amount',
+        'price',
         'currency',
-        'vehicle_id',
+        'property_id',
     ];
 }
