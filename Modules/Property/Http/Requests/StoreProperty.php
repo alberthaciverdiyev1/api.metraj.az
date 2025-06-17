@@ -46,6 +46,9 @@ class StoreProperty extends FormRequest
             'user_id' => 'nullable|exists:users,id',
             'realtor_id' => 'nullable|exists:users,id',
             'price' => 'required|integer|min:0',
+            'media' => 'required|array',
+            'features' => 'nullable|array',
+            'features.*' => 'nullable|exists:features,id',
         ];
     }
 

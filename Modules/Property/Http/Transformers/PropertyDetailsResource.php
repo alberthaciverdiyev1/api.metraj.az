@@ -4,6 +4,15 @@ namespace Modules\Property\Http\Transformers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Base\Enums\PropertyType;
+use Modules\Base\Enums\RepairType;
+use Modules\Base\Helpers\Enum;
+use Modules\Base\Http\Transformers\SubwayResource;
+use Modules\City\Http\Transformers\CityResource;
+use Modules\District\Http\Transformers\DistrictResource;
+use Modules\Feature\Http\Transformers\FeatureResource;
+use Modules\Media\Http\Transformers\MediaResource;
+use Modules\Price\Http\Transformers\PriceResource;
 use function Symfony\Component\Translation\t;
 
 class PropertyDetailsResource extends JsonResource
@@ -15,27 +24,22 @@ class PropertyDetailsResource extends JsonResource
     {
         return [
             'title' => $this->number_of_rooms . ' otaqlı ' . $this->subway->name ?? $this->district->name,
-            'price' => '400',
+            'prices' => PriceResource::collection($this->prices),
             'add_no' => $this->add_no,
             'slug' => $this->slug,
             'address' => $this->address,
             'description' => $this->description,
             'date' => \Carbon\Carbon::parse($this->getAttribute('date'))->format('d F, Y'),
             'area' => $this->area,
-            'field_area' => $this->field_area,
-
-//            'image'=>$this->image()
-            'images' => [
-                'https://themesflat.co/html/proty/images/blog/blog-grid-1.jpg',
-                'https://themesflat.co/html/proty/images/blog/blog-grid-2.jpg',
-                'https://themesflat.co/html/proty/images/blog/blog-grid-3.jpg',
-                'https://themesflat.co/html/proty/images/blog/blog-grid-4.jpg',
+            'field_area'=> $this->field_area,
+            'media' => [
+                'images' => MediaResource::collection($this->media->where('type', 'image')) ?? null,
+                'video'  => MediaResource::collection($this->media->where('type', 'video')) ?? null,
+                'document'  => MediaResource::collection($this->media->where('type', 'document'))  ?? null,
             ],
 
-            'video' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
-            'document' => 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+            'property_condition' => Enum::resolve(RepairType::class,$this->property_condition),
 
-            'property_type' => $this->property_type,
             'add_type' => $this->add_type,
             'number_of_floors' => $this->number_of_floors,
             'number_of_rooms' => $this->number_of_rooms,
@@ -49,16 +53,16 @@ class PropertyDetailsResource extends JsonResource
             'mail' => $this->mail,
             'in_credit' => $this->in_credit,
             'note_to_admin' => $this->note_to_admin,
-            'building_type' => $this->building_type,
+            'building_type' => Enum::resolve(PropertyType::class,$this->building_type),
             'has_video' => $this->has_video,
             'is_active' => $this->is_active,
             'is_premium' => $this->is_premium,
-            'features' => ["test", 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test'],
+            'features' => FeatureResource::collection($this->features),
             'location' => [
                 //            'town_id',
-//            'subway_id',
-//            'district_id' => ,
-//            'city_id',
+                'subway' => SubwayResource::make($this->subway),
+                'city' => CityResource::make($this->city),
+                'district' => DistrictResource::make($this->district),
                 'google_map_location' => $this->google_map_location ?? null,
                 'address' => $this->address ?? 'Not specified',
 

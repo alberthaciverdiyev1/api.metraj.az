@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Price\Http\Entities\Price;
+use Modules\Property\Http\Traits\PropertyAccessors;
+use Modules\Property\Http\Traits\PropertyRelations;
 
 class Property extends Model
 {
-    use SoftDeletes, HasFactory;
+    use SoftDeletes, HasFactory,PropertyRelations,PropertyAccessors;
 
     /**
      * The table associated with the model.
@@ -72,48 +74,15 @@ class Property extends Model
         'deleted_at' => 'datetime',
     ];
 
-    /**
-     * Relations
-     */
 
-    public function city()
-    {
-        return $this->belongsTo(\Modules\City\Http\Entities\City::class);
-    }
 
-    public function town()
+    public function firstImage()
     {
-        return $this->belongsTo(\Modules\Town\Http\Entities\Town::class);
+        return $this->morphOne(\Modules\Media\Http\Entities\Media::class, 'imageable')
+            ->where('type', 'image')
+            ->orderBy('created_at', 'asc');
     }
 
-    public function district()
-    {
-        return $this->belongsTo(\Modules\District\Http\Entities\District::class);
-    }
-
-    public function subway()
-    {
-        return $this->belongsTo(\Modules\Base\Http\Entities\Subway::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(\Modules\User\Http\Entities\User::class);
-    }
-
-    public function realtor()
-    {
-        return $this->belongsTo(\Modules\User\Http\Entities\User::class, 'realtor_id');
-    }
-
-    public function media()
-    {
-        return $this->morphMany(\Modules\Media\Http\Entities\Media::class, 'imageable');
-    }
-    public function prices()
-    {
-        return $this->hasMany(Price::class);
-    }
     public static function newFactory(): PropertyFactory
     {
         return PropertyFactory::new();

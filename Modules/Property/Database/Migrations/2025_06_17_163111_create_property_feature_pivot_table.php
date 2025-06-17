@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('media', function (Blueprint $table) {
-            $table->id();
-            $table->string('type'); // 'image', 'video', 'document' və s.
-            $table->string('path');
-            $table->morphs('imageable');
-            $table->timestamps();
-            $table->softDeletes();
+        Schema::create('feature_property', function (Blueprint $table) {
+            $table->foreignId('property_id')->constrained('properties')->onDelete('cascade');
+            $table->foreignId('feature_id')->constrained('features')->onDelete('cascade');
         });
     }
 
@@ -26,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('media');
+        Schema::dropIfExists('feature_property');
     }
 };

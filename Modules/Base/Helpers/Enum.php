@@ -16,4 +16,12 @@ class Enum
         }
         abort(response()->json(['error' => "Invalid $enum value: $key"], 422));
     }
+    public static function resolve($enum, $key){
+        foreach ($enum::cases() as $case) {
+            if ($case->value === $key) {
+                return $case->label();
+            }
+        }
+        abort(response()->json(['error' => "Invalid $enum value: $key"], 422));
+    }
 }

@@ -5,6 +5,7 @@ namespace Modules\Feature\Http\Entities;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Feature\Database\Factories\FeatureFactory;
+use Modules\Property\Http\Entities\Property;
 
 class Feature extends Model
 {
@@ -35,7 +36,10 @@ class Feature extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
-
+    public function properties()
+    {
+        return $this->belongsToMany(Property::class, 'feature_property', 'feature_id', 'property_id');
+    }
     public static function newFactory ()
     {
         return FeatureFactory::new();

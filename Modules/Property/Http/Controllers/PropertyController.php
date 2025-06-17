@@ -45,7 +45,10 @@ class PropertyController extends Controller
         $query = $query->with(['prices' => function ($query) {
             $query->select('price', 'currency', 'property_id', 'created_at')
                 ->orderBy('created_at', 'desc');
-        }]);
+        },
+            'firstImage' => function ($query) {
+                $query->select('type', 'path', 'imageable_id', 'imageable_type');
+            }]);
 
         if ($request->query('property-condition')) {
             $query = $query->where('property_condition', Enum::check(RepairType::class, $request->query('property-condition')));
@@ -70,7 +73,7 @@ class PropertyController extends Controller
         }
 
         $limit = $request->integer('limit', config('default.default_property_limit'));
-        $properties = $query->orderBy('created_at','desc')->paginate($limit)->appends($request->query());
+        $properties = $query->orderBy('created_at', 'desc')->paginate($limit)->appends($request->query());
         return PropertyListResource::collection($properties);
     }
 
@@ -79,7 +82,17 @@ class PropertyController extends Controller
     {
         $property = Property::query()
             ->where('id', $id)
-            ->with(['city', 'district', 'subway'])
+            ->with([
+                'city',
+                'district',
+                'subway',
+                'media',
+                'features',
+                'prices' => function ($query) {
+                    $query->select('price', 'currency', 'property_id', 'created_at')
+                        ->orderBy('created_at', 'desc');
+                }
+            ])
             ->firstOrFail();
         return new PropertyDetailsResource($property);
     }
@@ -93,7 +106,10 @@ class PropertyController extends Controller
 
         $validated['slug'] = Str::random(20);
         $price = $validated['price'] ?? null;
-        unset($validated['price']);
+        $media = $validated['media'] ?? null;
+        $features = $validated['features'] ?? [];
+        unset($validated['price'], $validated['media'], $validated['features']);
+
 
         $property = Property::create($validated);
 
@@ -102,8 +118,15 @@ class PropertyController extends Controller
             'price' => $price,
             'currency' => Enum::check(Currency::class, 'AZN'),
         ]);
+        $property->media()->createMany($media);
+        $property->features()->attach($features);
 
         return new PropertyDetailsResource($property);
+    }
+    public function update()
+    {
+      //  $property->features()->sync([1, 2, 3]);
+
     }
 
 }

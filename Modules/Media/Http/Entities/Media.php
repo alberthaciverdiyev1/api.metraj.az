@@ -22,9 +22,9 @@ class Media extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'image_path',
-        'imageable_id',
-        'imageable_type',
+        'path',
+        'imageable',
+        'type',
     ];
 
     /**
