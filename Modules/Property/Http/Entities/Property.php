@@ -6,6 +6,7 @@ use Database\Factories\PropertyFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Price\Http\Entities\Price;
 
 class Property extends Model
 {
@@ -108,6 +109,10 @@ class Property extends Model
     public function media()
     {
         return $this->morphMany(\Modules\Media\Http\Entities\Media::class, 'imageable');
+    }
+    public function prices()
+    {
+        return $this->hasMany(Price::class);
     }
     public static function newFactory(): PropertyFactory
     {

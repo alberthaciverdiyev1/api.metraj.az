@@ -45,6 +45,7 @@ class StoreProperty extends FormRequest
             'is_premium' => 'nullable|boolean',
             'user_id' => 'nullable|exists:users,id',
             'realtor_id' => 'nullable|exists:users,id',
+            'price' => 'required|integer|min:0',
         ];
     }
 

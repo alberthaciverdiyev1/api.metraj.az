@@ -5,6 +5,7 @@ namespace Modules\Property\Http\Transformers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
+use Modules\Price\Http\Transformers\PriceResource;
 
 class PropertyListResource extends JsonResource
 {
@@ -36,7 +37,7 @@ class PropertyListResource extends JsonResource
             'beds' => 4,
             'baths' => 3,
             'area' => $this->getAttribute('area'),
-            'price' => '8,600',
+            'price' => PriceResource::collection($this->prices),
         ];
     }
 }

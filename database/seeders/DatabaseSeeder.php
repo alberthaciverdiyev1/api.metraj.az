@@ -13,6 +13,7 @@ use Modules\District\Http\Entities\District;
 use Modules\Feature\Http\Entities\Feature;
 use Modules\Indicator\Http\Entities\Indicator;
 use Modules\Keyword\Http\Entities\Keyword;
+use Modules\Price\Http\Entities\Price;
 use Modules\Property\Http\Entities\Property;
 use Modules\Realtor\Http\Entities\Realtor;
 use Modules\Setting\Http\Entities\Setting;
@@ -42,6 +43,7 @@ class DatabaseSeeder extends Seeder
         Realtor::factory()->count(10)->create();
 
         Property::factory()->count(100)->create();
+        Price::factory()->count(100)->create();
 
     }
 }

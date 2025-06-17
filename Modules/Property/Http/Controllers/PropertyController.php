@@ -42,6 +42,10 @@ class PropertyController extends Controller
         $relations = $request->query('with', []);
         $query = Property::query()->when($relations, fn($q) => $q->with($relations));
 
+        $query = $query->with(['prices' => function ($query) {
+            $query->select('price', 'currency', 'property_id', 'created_at')
+                ->orderBy('created_at', 'desc');
+        }]);
 
         if ($request->query('property-condition')) {
             $query = $query->where('property_condition', Enum::check(RepairType::class, $request->query('property-condition')));
@@ -66,8 +70,7 @@ class PropertyController extends Controller
         }
 
         $limit = $request->integer('limit', config('default.default_property_limit'));
-        $properties = $query->paginate($limit)->appends($request->query());
-
+        $properties = $query->orderBy('created_at','desc')->paginate($limit)->appends($request->query());
         return PropertyListResource::collection($properties);
     }
 
@@ -89,7 +92,6 @@ class PropertyController extends Controller
         $validated['building_type'] = Enum::check(PropertyType::class, $validated['building_type']);
 
         $validated['slug'] = Str::random(20);
-
         $price = $validated['price'] ?? null;
         unset($validated['price']);
 
