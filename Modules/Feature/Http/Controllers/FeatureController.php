@@ -6,7 +6,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Feature\Http\Entities\Feature;
-use Modules\Feature\Transformers\FeatureResource;
+use Modules\Feature\Http\Transformers\FeatureResource;
+use Modules\Feature\Transformers\NearbyResource;
 use Nwidart\Modules\Facades\Module;
 
 class FeatureController extends Controller

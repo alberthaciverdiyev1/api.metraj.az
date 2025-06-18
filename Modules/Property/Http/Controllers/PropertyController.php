@@ -91,7 +91,8 @@ class PropertyController extends Controller
                 'prices' => function ($query) {
                     $query->select('price', 'currency', 'property_id', 'created_at')
                         ->orderBy('created_at', 'desc');
-                }
+                },
+                'nearbyObjects'
             ])
             ->firstOrFail();
         return new PropertyDetailsResource($property);
@@ -108,7 +109,8 @@ class PropertyController extends Controller
         $price = $validated['price'] ?? null;
         $media = $validated['media'] ?? null;
         $features = $validated['features'] ?? [];
-        unset($validated['price'], $validated['media'], $validated['features']);
+        $nearby_objects = $validated['nearby_objects'] ?? [];
+        unset($validated['price'], $validated['media'], $validated['features'], $validated['nearby_objects']);
 
 
         $property = Property::create($validated);
@@ -120,6 +122,7 @@ class PropertyController extends Controller
         ]);
         $property->media()->createMany($media);
         $property->features()->attach($features);
+        $property->nearbyObjects()->attach($nearby_objects);
 
         return new PropertyDetailsResource($property);
     }

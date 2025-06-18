@@ -5,6 +5,8 @@ namespace Modules\Nearby\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Nearby\Http\Entities\Nearby;
+use Modules\Nearby\Http\Transformers\NearbyResource;
 use Nwidart\Modules\Facades\Module;
 
 class NearbyController extends Controller
@@ -12,23 +14,24 @@ class NearbyController extends Controller
 
     public function __construct()
     {
-        if (Module::find('Roles')->isEnabled()) {
-            $this->middleware('permission:view nearbys')->only('index');
-            $this->middleware('permission:create nearby')->only('create');
-            $this->middleware('permission:store nearby')->only('store');
-            $this->middleware('permission:edit nearby')->only('edit');
-            $this->middleware('permission:update nearby')->only('update');
-            $this->middleware('permission:destroy nearby')->only('destroy');
-        }
+ //       if (Module::find('Roles')->isEnabled()) {
+//            $this->middleware('permission:view nearbys')->only('index');
+//            $this->middleware('permission:create nearby')->only('create');
+//            $this->middleware('permission:store nearby')->only('store');
+//            $this->middleware('permission:edit nearby')->only('edit');
+//            $this->middleware('permission:update nearby')->only('update');
+//            $this->middleware('permission:destroy nearby')->only('destroy');
+  //      }
     }
 
 
     /**
-    * Display a listing of the resource.
-    */
-    public function index()
+     * Display a listing of the resource.
+     */
+    public function all()
     {
-        return view('nearby::index');
+        $nearby_objects = Nearby::all();
+        return NearbyResource::collection($nearby_objects);
     }
 
     /**

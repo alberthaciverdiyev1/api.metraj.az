@@ -3,6 +3,7 @@
 namespace Modules\Property\Http\Traits;
 
 use Modules\Feature\Http\Entities\Feature;
+use Modules\Nearby\Http\Entities\Nearby;
 use Modules\Price\Http\Entities\Price;
 
 trait PropertyRelations
@@ -48,5 +49,9 @@ trait PropertyRelations
     public function features()
     {
         return $this->belongsToMany(Feature::class, 'feature_property', 'property_id', 'feature_id');
+    }
+    public function nearbyObjects()
+    {
+        return $this->belongsToMany(Nearby::class, 'nearby_property', 'property_id', 'nearby_id');
     }
 }

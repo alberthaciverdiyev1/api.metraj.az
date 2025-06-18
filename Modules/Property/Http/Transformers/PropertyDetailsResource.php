@@ -12,6 +12,7 @@ use Modules\City\Http\Transformers\CityResource;
 use Modules\District\Http\Transformers\DistrictResource;
 use Modules\Feature\Http\Transformers\FeatureResource;
 use Modules\Media\Http\Transformers\MediaResource;
+use Modules\Nearby\Http\Transformers\NearbyResource;
 use Modules\Price\Http\Transformers\PriceResource;
 use function Symfony\Component\Translation\t;
 
@@ -58,6 +59,7 @@ class PropertyDetailsResource extends JsonResource
             'is_active' => $this->is_active,
             'is_premium' => $this->is_premium,
             'features' => FeatureResource::collection($this->features),
+            'nearby'=>NearbyResource::collection($this->nearbyObjects),
             'location' => [
                 //            'town_id',
                 'subway' => SubwayResource::make($this->subway),
@@ -71,19 +73,7 @@ class PropertyDetailsResource extends JsonResource
                 'link' => 'https://www.youtube.com/embed/MLpWrANjFbI',
                 'image' => 'https://themesflat.co/html/proty/images/section/property-detail-2.jpg',
             ],
-            'nearby_objects' => [
-                ['range' => '1km',
-                    'name' => 'Araz Market'
-                ],
-                [
-                    'range' => '100m',
-                    'name' => 'Bravo Supermarket'
-                ],
-                [
-                    'range' => '1km',
-                    'name' => 'Inshaatcilar m-su'
-                ]
-            ],
+
 //            'user_id' ,
 //            'realtor_id',
         ];

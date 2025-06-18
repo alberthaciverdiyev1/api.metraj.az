@@ -4,6 +4,9 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
+use Modules\Base\Enums\PropertyType;
+use Modules\Base\Enums\RepairType;
+use Modules\Base\Helpers\Enum;
 use Modules\Base\Http\Entities\Subway;
 use Modules\City\Http\Entities\City;
 use Modules\District\Http\Entities\District;
@@ -44,7 +47,7 @@ class PropertyFactory extends Factory
             'in_credit' => $this->faker->boolean(),
             'document' => $this->faker->randomNumber(),
             'note_to_admin' => $this->faker->text(),
-            'building_type' => $this->faker->name(),
+            'building_type' => $this->faker->randomElement(['0x001', '0x002', '0x003', '0x004', '0x005', '0x006', '0x007', '0x008']),
             'has_video' => $this->faker->boolean(),
             'google_map_location' => $this->faker->localIpv4(),
             'is_active' => $this->faker->boolean(),
@@ -53,6 +56,7 @@ class PropertyFactory extends Factory
             'realtor_id' => Realtor::inRandomOrder()->first()->id,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
+
         ];
     }
 

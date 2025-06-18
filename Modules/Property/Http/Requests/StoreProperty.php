@@ -49,6 +49,8 @@ class StoreProperty extends FormRequest
             'media' => 'required|array',
             'features' => 'nullable|array',
             'features.*' => 'nullable|exists:features,id',
+            'nearby_objects' => 'nullable|array',
+            'nearby_objects.*' => 'nullable|exists:nearby_objects,id',
         ];
     }
 

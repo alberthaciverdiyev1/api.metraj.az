@@ -13,8 +13,9 @@ use Illuminate\Http\Request;
 |
 */
 
+Route::get('nearby', [\Modules\Nearby\Http\Controllers\NearbyController::class, 'all']);
 
-Route::middleware('auth:api')->group(function () {
-    Route::resource('/nearby', \Modules\Nearby\Http\Controllers\NearbyController::class);
-});
+//Route::middleware('auth:api')->group(function () {
+//    Route::resource('/nearby', \Modules\Nearby\Http\Controllers\NearbyController::class);
+//});
 
