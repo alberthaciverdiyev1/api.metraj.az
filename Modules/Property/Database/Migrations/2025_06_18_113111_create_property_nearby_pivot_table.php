@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('nearby_property', function (Blueprint $table) {
+            $table->primary(['property_id', 'nearby_id']);
             $table->foreignId('property_id')->constrained('properties')->onDelete('cascade');
             $table->foreignId('nearby_id')->constrained('nearby_objects')->onDelete('cascade');
         });
