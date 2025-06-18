@@ -1,0 +1,11 @@
+{
+    "name": "Nearby",
+    "alias": "nearby",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Nearby\\Providers\\NearbyServiceProvider"
+    ],
+    "files": []
+}

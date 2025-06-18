@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/nearby",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Nearby\\": "app/",
+            "Modules\\Nearby\\Database\\Factories\\": "database/factories/",
+            "Modules\\Nearby\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Nearby\\Tests\\": "tests/"
+        }
+    }
+}
