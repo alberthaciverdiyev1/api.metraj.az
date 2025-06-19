@@ -25,6 +25,8 @@ class PropertyListResource extends JsonResource
             'baths' => 3,
             'area' => $this->getAttribute('area'),
             'price' => PriceResource::collection($this->prices),
+            'add_type' => $this->add_type,
+            'is_premium' => $this->is_premium,
             'media' => $this->media->isNotEmpty() ? MediaResource::make($this->media->first()) : 'https://static.vecteezy.com/system/resources/previews/004/640/986/non_2x/tower-building-illustration-isolated-on-white-background-vector.jpg',
         ];
     }
