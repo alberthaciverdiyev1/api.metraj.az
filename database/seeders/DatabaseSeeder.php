@@ -85,7 +85,6 @@ class DatabaseSeeder extends Seeder
         Tag::factory()->count(1000)->create();
         BlogCategory::factory()->count(10)->create();
         Blog::factory()->count(50)->create();
-        Realtor::factory()->count(10)->create();
         Nearby::factory()->count(99)->create();
         Property::factory()->count(100)->create();
         Price::factory()->count(100)->create();
@@ -100,7 +99,15 @@ class DatabaseSeeder extends Seeder
             $nearbyIds = Nearby::inRandomOrder()->limit(rand(3, 20))->pluck('id');
             $property->nearbyObjects()->attach($nearbyIds);
 
-            $property->media()->createMany($mediaData);
+            $shuffledMedia = collect($mediaData)
+                ->shuffle()
+                ->sortBy(function ($item, $key) {
+                    return $item['type'] === 'video' ? 1 : 0;
+                })
+                ->values()
+                ->all();
+
+            $property->media()->createMany($shuffledMedia);
             $property->features()->attach(Feature::inRandomOrder()->limit(rand(3, 20))->pluck('id'));
         });
 

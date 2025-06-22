@@ -58,7 +58,6 @@ class Property extends Model
         'is_active',
         'is_premium',
         'user_id',
-        'realtor_id',
     ];
 
     /**

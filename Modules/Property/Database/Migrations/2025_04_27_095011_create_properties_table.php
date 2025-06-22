@@ -44,7 +44,6 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->boolean('is_premium')->default(false);
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('realtor_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });
