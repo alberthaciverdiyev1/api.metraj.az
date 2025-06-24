@@ -18,6 +18,8 @@ Route::get('property', [\Modules\Property\Http\Controllers\PropertyController::c
 Route::get('property/{id}', [PropertyController::class, 'details']);
 Route::post('property', [PropertyController::class, 'add']);
 
+Route::get('agency-property/{id}', [PropertyController::class, 'agencyProperties']);
+
 
 
 //Route::middleware('auth:api')->group(function () {

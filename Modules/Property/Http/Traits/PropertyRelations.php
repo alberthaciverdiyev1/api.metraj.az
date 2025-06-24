@@ -33,11 +33,6 @@ trait PropertyRelations
         return $this->belongsTo(\Modules\User\Http\Entities\User::class);
     }
 
-    public function realtor()
-    {
-        return $this->belongsTo(\Modules\User\Http\Entities\User::class, 'realtor_id');
-    }
-
     public function media()
     {
         return $this->morphMany(\Modules\Media\Http\Entities\Media::class, 'imageable');

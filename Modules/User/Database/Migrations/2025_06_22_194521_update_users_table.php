@@ -27,6 +27,14 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->boolean('is_premium')->default(false);
             $table->boolean('is_confirmed')->default(false);
+
+            $table->boolean('is_agency')->default(false);
+            $table->string('profile_image')->nullable();
+            $table->string('background_image')->nullable();
+            $table->string('location')->nullable();
+            $table->text('short_description')->nullable();
+            $table->text('work_hours')->nullable();
+            $table->timestamps();
         });
     }
 

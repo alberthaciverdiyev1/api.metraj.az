@@ -4,6 +4,7 @@ namespace Modules\Property\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
 use Modules\Base\Enums\Currency;
@@ -61,6 +62,24 @@ class PropertyController extends Controller
         }
         if ($request->query('room-count')) {
             $query = $query->where('number_of_rooms', (integer)$request->query('room-count'));
+        }
+        if ($request->query('city-id')) {
+            $query = $query->where('city_id', (integer)$request->query('city-id'));
+        }
+        if ($request->query('town-id')) {
+            $query = $query->where('town_id', (integer)$request->query('town-id'));
+        }
+        if ($request->query('subway-id')) {
+            $query = $query->where('subway_id', (integer)$request->query('subway-id'));
+        }
+        if ($request->query('district-id')) {
+            $query = $query->where('district_id', (integer)$request->query('district-id'));
+        }
+        if ($request->query('price-min')) {
+            $query = $query->where('price', '>=', (integer)$request->query('price-min'));
+        }
+        if ($request->query('price-max')) {
+            $query = $query->where('price', '<=', (integer)$request->query('price-max'));
         }
 
         foreach (['area', 'field_area'] as $rangeParam) {
@@ -126,10 +145,25 @@ class PropertyController extends Controller
 
         return new PropertyDetailsResource($property);
     }
+
     public function update()
     {
-      //  $property->features()->sync([1, 2, 3]);
+        //  $property->features()->sync([1, 2, 3]);
 
+    }
+
+    public function agencyProperties(Request $request, int $agencyId):AnonymousResourceCollection
+    {
+        $properties = Property::query()->with(
+            ['prices' => function ($query) {
+                $query->select('price', 'currency', 'property_id', 'created_at')->orderBy('created_at', 'desc');
+            },
+                'firstImage' => function ($query) {
+                    $query->select('type', 'path', 'imageable_id', 'imageable_type');
+                }])
+            ->where('user_id', $agencyId)->get();
+
+        return PropertyListResource::collection($properties);
     }
 
 }

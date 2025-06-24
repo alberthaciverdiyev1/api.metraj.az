@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Modules\Property\Http\Entities\Property;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
@@ -23,6 +24,23 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'address',
+        'subway_id',
+        'district_id',
+        'city_id',
+        'town_id',
+        'phone_1',
+        'phone_2',
+        'phone_3',
+        'phone_4',
+        'is_active',
+        'is_premium',
+        'is_confirmed',
+        'is_agency',
+        'profile_image',
+        'background_image',
+        'short_description',
+        'work_hours'
     ];
 
     /**
@@ -46,6 +64,12 @@ class User extends Authenticatable implements JWTSubject
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+
+    public function properties(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Property::class);
     }
 
     public static function newFactory(): UserFactory

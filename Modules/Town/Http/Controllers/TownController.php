@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 use Modules\Town\Http\Entities\Town;
 use Modules\Town\Http\Requests\TownStoreRequest;
 use Modules\Town\Http\Requests\TownUpdateRequest;
-use Modules\Town\Http\Transformers\TownResource;
+use Modules\Town\Http\Transformers\UserResource;
 use Nwidart\Modules\Facades\Module;
 
 class TownController extends Controller
@@ -44,7 +44,7 @@ class TownController extends Controller
             ->latest()
             ->get();
 
-        return TownResource::collection($blogs);
+        return UserResource::collection($blogs);
     }
 
     public function details(string $slug)

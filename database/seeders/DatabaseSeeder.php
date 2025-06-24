@@ -18,7 +18,6 @@ use Modules\Keyword\Http\Entities\Keyword;
 use Modules\Nearby\Http\Entities\Nearby;
 use Modules\Price\Http\Entities\Price;
 use Modules\Property\Http\Entities\Property;
-use Modules\Realtor\Http\Entities\Realtor;
 use Modules\Setting\Http\Entities\Setting;
 use Modules\Town\Http\Entities\Town;
 use Modules\User\Http\Entities\User;
@@ -81,14 +80,15 @@ class DatabaseSeeder extends Seeder
         Town::factory()->count(10)->create();
         Setting::factory()->count(1)->create();
         Keyword::factory()->count(10)->create();
-        User::factory()->count(10)->create();
+        User::factory()->count(100)->create();
         Tag::factory()->count(1000)->create();
         BlogCategory::factory()->count(10)->create();
         Blog::factory()->count(50)->create();
         Nearby::factory()->count(99)->create();
-        Property::factory()->count(100)->create();
-        Price::factory()->count(100)->create();
-        Property::factory(50)->create()->each(function ($property) use ($mediaData) {
+
+        $properties = Property::factory(100)->create();
+
+        $properties->each(function ($property) use ($mediaData) {
 
             Price::create([
                 'property_id' => $property->id,
@@ -101,7 +101,7 @@ class DatabaseSeeder extends Seeder
 
             $shuffledMedia = collect($mediaData)
                 ->shuffle()
-                ->sortBy(function ($item, $key) {
+                ->sortBy(function ($item) {
                     return $item['type'] === 'video' ? 1 : 0;
                 })
                 ->values()
@@ -110,6 +110,5 @@ class DatabaseSeeder extends Seeder
             $property->media()->createMany($shuffledMedia);
             $property->features()->attach(Feature::inRandomOrder()->limit(rand(3, 20))->pluck('id'));
         });
-
     }
 }

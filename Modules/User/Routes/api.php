@@ -30,3 +30,6 @@ Route::middleware('auth:api')->group(function () {
 
 });
 
+Route::get('agency/{id}', [\Modules\User\Http\Controllers\AgencyController::class, 'details']);
+Route::get('agency', [\Modules\User\Http\Controllers\AgencyController::class, 'index']);
+

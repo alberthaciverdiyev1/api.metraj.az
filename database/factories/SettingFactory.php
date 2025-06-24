@@ -12,7 +12,7 @@ class SettingFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->company,
+            'name' => 'Metraj.az',
             'logo' => $this->faker->imageUrl(100, 100, 'business', true, 'logo'),
             'favicon' => $this->faker->imageUrl(50, 50, 'business', true, 'favicon'),
             'description' => $this->faker->paragraph,
