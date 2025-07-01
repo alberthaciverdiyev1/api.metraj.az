@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Modules\Seo\Http\Controllers\SeoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,8 +14,13 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('seo', [\Modules\Seo\Http\Controllers\SeoController::class, 'list']);
 
+Route::controller(SeoController::class)->prefix('seo')->group(function () {
+    Route::get('/', [\Modules\Seo\Http\Controllers\SeoController::class, 'index']);
+    Route::post('/', [\Modules\Seo\Http\Controllers\SeoController::class, 'store']);
+    Route::put('/{id}', [\Modules\Seo\Http\Controllers\SeoController::class, 'update']);
+    Route::delete('/{id}', [\Modules\Seo\Http\Controllers\SeoController::class, 'delete']);
+});
 
 //Route::middleware('auth:api')->group(function () {
 //    Route::resource('/seo', \Modules\Seo\Http\Controllers\SeoController::class);

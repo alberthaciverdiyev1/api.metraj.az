@@ -19,10 +19,10 @@ return new class extends Migration
             $table->foreignId('subway_id')->nullable()->constrained('subways')->nullOnDelete();
             $table->foreignId('town_id')->nullable()->constrained('towns')->nullOnDelete();
 
-            $table->string('phone_1')->unique();
-            $table->string('phone_2')->unique();
-            $table->string('phone_3')->unique();
-            $table->string('phone_4')->unique();
+            $table->string('phone_1')->nullable()->unique();
+            $table->string('phone_2')->nullable()->unique();
+            $table->string('phone_3')->nullable()->unique();
+            $table->string('phone_4')->nullable()->unique();
 
             $table->boolean('is_active')->default(true);
             $table->boolean('is_premium')->default(false);

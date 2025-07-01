@@ -2,19 +2,21 @@
 
 namespace Modules\Seo\Http\Entities;
 
+use Database\Factories\SeoFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Seo extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes,HasFactory;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'seos';
+    protected $table = 'seo';
 
     /**
      * The attributes that are mass assignable.
@@ -27,6 +29,8 @@ class Seo extends Model
         'meta_tags',
         'other_codes',
         'page',
+        'user_id',
+        'is_active'
     ];
 
     /**
@@ -38,12 +42,9 @@ class Seo extends Model
         'deleted_at' => 'datetime',
     ];
 
-    /**
-     * Relations
-     */
-    // SEO, çoğu zaman bir sayfa ile ilişkilendirilebilir. İlgili sayfa modeli ile ilişki kurmak istenirse:
-    public function pageable()
+    public static function newFactory():SeoFactory
     {
-        return $this->morphTo();
+        return SeoFactory::new();
     }
+
 }

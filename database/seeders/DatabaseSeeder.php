@@ -18,6 +18,7 @@ use Modules\Keyword\Http\Entities\Keyword;
 use Modules\Nearby\Http\Entities\Nearby;
 use Modules\Price\Http\Entities\Price;
 use Modules\Property\Http\Entities\Property;
+use Modules\Seo\Http\Entities\Seo;
 use Modules\Setting\Http\Entities\Setting;
 use Modules\Town\Http\Entities\Town;
 use Modules\User\Http\Entities\User;
@@ -81,6 +82,7 @@ class DatabaseSeeder extends Seeder
         Setting::factory()->count(1)->create();
         Keyword::factory()->count(10)->create();
         User::factory()->count(100)->create();
+        Seo::factory()->count(5)->create();
         Tag::factory()->count(1000)->create();
         BlogCategory::factory()->count(10)->create();
         Blog::factory()->count(50)->create();

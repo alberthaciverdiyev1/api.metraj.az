@@ -27,78 +27,61 @@ class SeoController extends Controller
     /**
     * Display a listing of the resource.
     */
-    public function list()
+    public function index()
     {
-        $seos = Seo::all();
-        return $seos;
-    }
+        $seo = Seo::latest()->paginate(15);
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('seo::create');
+        return response()->json($seo);
     }
-
-    /**
+        /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        try {
+        $data = $request->validate([
+            'title'        => 'nullable|string|max:255',
+            'description'  => 'nullable|string',
+            'meta_tags'    => 'nullable|string',
+            'other_codes'  => 'nullable|string',
+            'page'         => 'nullable|string|max:255',
+            'is_active'    => 'nullable|boolean',
+        ]);
 
-            //TODO:STORE FUNCTIONS
+        $data['user_id'] = auth()->id();
 
-            return response()->json(__('Data successfully created!'));
-        } catch (Exception $e) {
-            return response()->json($e->getMessage());
-        }
+        $seo = Seo::create($data);
+
+        return response()->json(['message' => 'SEO created.', 'data' => $seo], 201);
     }
 
-    /**
-     * Show the specified resource.
-     */
-    public function show()
+
+    public function update(Request $request, $id)
     {
-        return view('seo::show');
+        $data = $request->validate([
+            'title'        => 'nullable|string|max:255',
+            'description'  => 'nullable|string',
+            'meta_tags'    => 'nullable|string',
+            'other_codes'  => 'nullable|string',
+            'page'         => 'nullable|string|max:255',
+            'is_active'    => 'nullable|boolean',
+        ]);
+
+        $seo = Seo::findOrFail($id);
+        $seo->update($data);
+
+        return response()->json(['message' => 'SEO updated.', 'data' => $seo]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit()
-    {
-        return view('seo::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request)
-    {
-        try {
-
-            //TODO:UPDATE FUNCTIONS
-
-            return response()->json(__('Data successfully updated!'));
-        } catch (Exception $e) {
-            return response()->json($e->getMessage());
-        }
-    }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy()
+    public function delete($id)
     {
-        try {
+        $seo = Seo::findOrFail($id);
+        $seo->delete();
 
-            //TODO:DESTROY FUNCTIONS
-
-            return response()->json(__('Data successfully deleted!'));
-        } catch (Exception $e) {
-            return response()->json($e->getMessage());
-        }
+        return response()->json(['message' => 'SEO deleted.']);
     }
+
 }
