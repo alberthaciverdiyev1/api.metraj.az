@@ -17,6 +17,7 @@ use Modules\Seo\Http\Controllers\SeoController;
 
 Route::controller(SeoController::class)->prefix('seo')->group(function () {
     Route::get('/', [\Modules\Seo\Http\Controllers\SeoController::class, 'index']);
+    Route::get('/{page}', [\Modules\Seo\Http\Controllers\SeoController::class, 'details']);
     Route::post('/', [\Modules\Seo\Http\Controllers\SeoController::class, 'store']);
     Route::put('/{id}', [\Modules\Seo\Http\Controllers\SeoController::class, 'update']);
     Route::delete('/{id}', [\Modules\Seo\Http\Controllers\SeoController::class, 'delete']);

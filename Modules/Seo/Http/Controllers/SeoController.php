@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Seo\Http\Entities\Seo;
+use Modules\Seo\Http\Transformers\SeoResource;
 use Nwidart\Modules\Facades\Module;
 
 class SeoController extends Controller
@@ -25,31 +26,32 @@ class SeoController extends Controller
 
 
     /**
-    * Display a listing of the resource.
-    */
+     * Display a listing of the resource.
+     */
     public function index()
     {
         $seo = Seo::latest()->paginate(15);
 
         return response()->json($seo);
     }
-        /**
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title'        => 'nullable|string|max:255',
-            'description'  => 'nullable|string',
-            'meta_tags'    => 'nullable|string',
-            'other_codes'  => 'nullable|string',
-            'page'         => 'nullable|string|max:255',
-            'is_active'    => 'nullable|boolean',
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'meta_tags' => 'nullable|string',
+            'other_codes' => 'nullable|string',
+            'page' => 'nullable|string|max:255',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $data['user_id'] = auth()->id();
 
-        $seo = Seo::create($data);
+        $seo = Seo::createOrUpdate($data);
 
         return response()->json(['message' => 'SEO created.', 'data' => $seo], 201);
     }
@@ -58,12 +60,12 @@ class SeoController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->validate([
-            'title'        => 'nullable|string|max:255',
-            'description'  => 'nullable|string',
-            'meta_tags'    => 'nullable|string',
-            'other_codes'  => 'nullable|string',
-            'page'         => 'nullable|string|max:255',
-            'is_active'    => 'nullable|boolean',
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'meta_tags' => 'nullable|string',
+            'other_codes' => 'nullable|string',
+            'page' => 'nullable|string|max:255',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $seo = Seo::findOrFail($id);
@@ -84,4 +86,9 @@ class SeoController extends Controller
         return response()->json(['message' => 'SEO deleted.']);
     }
 
+    public function details($page)
+    {
+        $seo = Seo::query()->where('page', $page)->first();
+        return SeoResource::make($seo);
+    }
 }

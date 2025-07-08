@@ -51,35 +51,65 @@ class PropertyController extends Controller
                 $query->select('type', 'path', 'imageable_id', 'imageable_type');
             }]);
 
-        if ($request->query('property-condition')) {
-            $query = $query->where('property_condition', Enum::check(RepairType::class, $request->query('property-condition')));
+        if ($request->has('priceMin')) {
+            $query->whereHas('prices', function ($q) use ($request) {
+                $q->orderBy('created_at', 'desc')
+                    ->take(1)
+                    ->where('price', '>=', (int)$request->query('priceMin'));
+            });
+
         }
-        if ($request->query('property-type')) {
-            $query = $query->where('add_type', $request->query('property-type'));
+
+        if ($request->has('priceMax')) {
+            $query->whereHas('prices', function ($q) use ($request) {
+                $q->orderBy('created_at', 'desc')
+                    ->take(1)
+                    ->where('price', '<=', (int)$request->query('priceMax'));
+            });
+
         }
-        if ($request->query('building-type')) {
-            $query = $query->where('building_type', Enum::check(PropertyType::class, $request->query('building-type')));
+
+        if ($request->query('propertyCondition')) {
+            $query = $query->where('property_condition', Enum::check(RepairType::class, $request->query('propertyCondition')));
         }
-        if ($request->query('room-count')) {
-            $query = $query->where('number_of_rooms', (integer)$request->query('room-count'));
+        if ($request->query('add_type')) {
+            $query = $query->where('add_type', $request->query('add_type'));
         }
-        if ($request->query('city-id')) {
-            $query = $query->where('city_id', (integer)$request->query('city-id'));
+        if ($request->query('buildingType')) {
+            $query = $query->where('building_type', Enum::check(PropertyType::class, $request->query('buildingType')));
         }
-        if ($request->query('town-id')) {
-            $query = $query->where('town_id', (integer)$request->query('town-id'));
+        if ($request->query('roomCount')) {
+            $query = $query->where('number_of_rooms', (integer)$request->query('roomCount'));
         }
-        if ($request->query('subway-id')) {
-            $query = $query->where('subway_id', (integer)$request->query('subway-id'));
+        if ($request->query('cityId')) {
+            $query = $query->where('city_id', (integer)$request->query('cityId'));
         }
-        if ($request->query('district-id')) {
-            $query = $query->where('district_id', (integer)$request->query('district-id'));
+        if ($request->query('townId')) {
+            $query = $query->where('town_id', (integer)$request->query('townId'));
         }
-        if ($request->query('price-min')) {
-            $query = $query->where('price', '>=', (integer)$request->query('price-min'));
+        if ($request->query('subwayId')) {
+            $query = $query->where('subway_id', (integer)$request->query('subwayId'));
         }
-        if ($request->query('price-max')) {
-            $query = $query->where('price', '<=', (integer)$request->query('price-max'));
+        if ($request->query('districtId')) {
+            $query = $query->where('district_id', (integer)$request->query('districtId'));
+        }
+        if ($request->query('adNo')) {
+            $query = $query->where('add_no', (integer)$request->query('adNo'));
+        }
+        if ($request->query('address')) {
+            $query = $query->where('address', (integer)$request->query('address'));
+        }
+        if ($request->query('numberOfFloors')) {
+            $query = $query->where('number_of_floors', (integer)$request->query('numberOfFloors'));
+        }
+        if ($request->query('floorLocated')) {
+            $query = $query->where('floor_located', (integer)$request->query('floorLocated'));
+        }
+        if ($request->query('inCredit')) {
+            $query = $query->where('in_credit', (integer)$request->query('inCredit'));
+        }
+        if ($request->query('hasVideo')) {
+            $query = $query->where('has_video', (integer)$request->query('hasVideo'));
         }
 
         foreach (['area', 'field_area'] as $rangeParam) {
@@ -152,18 +182,46 @@ class PropertyController extends Controller
 
     }
 
-    public function agencyProperties(Request $request, int $agencyId):AnonymousResourceCollection
+    public function agencyProperties(Request $request, int $agencyId)
     {
-        $properties = Property::query()->with(
-            ['prices' => function ($query) {
-                $query->select('price', 'currency', 'property_id', 'created_at')->orderBy('created_at', 'desc');
-            },
-                'firstImage' => function ($query) {
-                    $query->select('type', 'path', 'imageable_id', 'imageable_type');
-                }])
-            ->where('user_id', $agencyId)->get();
+        if ($request->has('add_type')) {
+            $query = Property::query()
+                ->with([
+                    'prices' => function ($q) {
+                        $q->select('price', 'currency', 'property_id', 'created_at')->orderBy('created_at', 'desc');
+                    },
+                    'firstImage' => function ($q) {
+                        $q->select('type', 'path', 'imageable_id', 'imageable_type');
+                    }
+                ])
+                ->where('user_id', $agencyId)
+                ->where('add_type', $request->query('add_type'));
 
-        return PropertyListResource::collection($properties);
+            $properties = $query->paginate(config('default.default_property_limit'));
+
+            return PropertyListResource::collection($properties);
+        }
+
+        $propertyGroups = [];
+
+        foreach (PropertyType::cases() as $type) {
+            $groupQuery = Property::query()
+                ->with([
+                    'prices' => function ($q) {
+                        $q->select('price', 'currency', 'property_id', 'created_at')->orderBy('created_at', 'desc');
+                    },
+                    'firstImage' => function ($q) {
+                        $q->select('type', 'path', 'imageable_id', 'imageable_type');
+                    }
+                ])
+                ->where('user_id', $agencyId)
+                ->where('building_type', $type->value)
+                ->limit(config('default.default_property_limit'));
+
+            $propertyGroups[$type->label()] = PropertyListResource::collection($groupQuery->get());
+        }
+
+        return response()->json($propertyGroups);
     }
 
 }
