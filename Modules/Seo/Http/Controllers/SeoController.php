@@ -89,6 +89,6 @@ class SeoController extends Controller
     public function details($page)
     {
         $seo = Seo::query()->where('page', $page)->first();
-        return SeoResource::make($seo);
+        return $seo ? SeoResource::make($seo) : null;
     }
 }

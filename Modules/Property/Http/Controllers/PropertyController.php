@@ -220,8 +220,7 @@ class PropertyController extends Controller
 
             $propertyGroups[$type->label()] = PropertyListResource::collection($groupQuery->get());
         }
-
-        return response()->json($propertyGroups);
+        return response()->json(["data"=>$propertyGroups]);
     }
 
 }
