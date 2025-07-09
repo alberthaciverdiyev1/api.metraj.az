@@ -43,87 +43,87 @@ class PropertyController extends Controller
         $relations = $request->query('with', []);
         $query = Property::query()->when($relations, fn($q) => $q->with($relations));
 
-        $query = $query->with(['prices' => function ($query) {
-            $query->select('price', 'currency', 'property_id', 'created_at')
-                ->orderBy('created_at', 'desc');
-        },
-            'firstImage' => function ($query) {
-                $query->select('type', 'path', 'imageable_id', 'imageable_type');
-            }]);
-
-        if ($request->has('priceMin')) {
-            $query->whereHas('prices', function ($q) use ($request) {
-                $q->orderBy('created_at', 'desc')
-                    ->take(1)
-                    ->where('price', '>=', (int)$request->query('priceMin'));
-            });
-
-        }
-
-        if ($request->has('priceMax')) {
-            $query->whereHas('prices', function ($q) use ($request) {
-                $q->orderBy('created_at', 'desc')
-                    ->take(1)
-                    ->where('price', '<=', (int)$request->query('priceMax'));
-            });
-
-        }
-
-        if ($request->query('propertyCondition')) {
-            $query = $query->where('property_condition', Enum::check(RepairType::class, $request->query('propertyCondition')));
-        }
-        if ($request->query('add_type')) {
-            $query = $query->where('add_type', $request->query('add_type'));
-        }
-        if ($request->query('buildingType')) {
-            $query = $query->where('building_type', Enum::check(PropertyType::class, $request->query('buildingType')));
-        }
-        if ($request->query('roomCount')) {
-            $query = $query->where('number_of_rooms', (integer)$request->query('roomCount'));
-        }
-        if ($request->query('cityId')) {
-            $query = $query->where('city_id', (integer)$request->query('cityId'));
-        }
-        if ($request->query('townId')) {
-            $query = $query->where('town_id', (integer)$request->query('townId'));
-        }
-        if ($request->query('subwayId')) {
-            $query = $query->where('subway_id', (integer)$request->query('subwayId'));
-        }
-        if ($request->query('districtId')) {
-            $query = $query->where('district_id', (integer)$request->query('districtId'));
-        }
-        if ($request->query('adNo')) {
-            $query = $query->where('add_no', (integer)$request->query('adNo'));
-        }
-        if ($request->query('address')) {
-            $query = $query->where('address', (integer)$request->query('address'));
-        }
-        if ($request->query('numberOfFloors')) {
-            $query = $query->where('number_of_floors', (integer)$request->query('numberOfFloors'));
-        }
-        if ($request->query('floorLocated')) {
-            $query = $query->where('floor_located', (integer)$request->query('floorLocated'));
-        }
-        if ($request->query('inCredit')) {
-            $query = $query->where('in_credit', (integer)$request->query('inCredit'));
-        }
-        if ($request->query('hasVideo')) {
-            $query = $query->where('has_video', (integer)$request->query('hasVideo'));
-        }
-
-        foreach (['area', 'field_area'] as $rangeParam) {
-            if ($request->has("$rangeParam.min") || $request->has("$rangeParam.max")) {
-                $query->whereBetween($rangeParam, [
-                    $request->input("$rangeParam.min", 0),
-                    $request->input("$rangeParam.max", PHP_INT_MAX)
-                ]);
+        $query->with([
+            'prices' => function ($q) {
+                $q->select('price', 'currency', 'property_id', 'created_at')
+                    ->orderBy('created_at', 'desc');
+            },
+            'firstImage' => function ($q) {
+                $q->select('type', 'path', 'imageable_id', 'imageable_type');
             }
+        ]);
+
+        if (!empty($request->query())) {
+            if ($request->has('priceMin')) {
+                $query->whereHas('prices', fn($q) => $q->where('price', '>=', (int)$request->query('priceMin')));
+            }
+            if ($request->has('priceMax')) {
+                $query->whereHas('prices', fn($q) => $q->where('price', '<=', (int)$request->query('priceMax')));
+            }
+
+            $filters = [
+                'propertyCondition' => ['column' => 'property_condition', 'transform' => fn($v) => Enum::check(RepairType::class, $v)],
+                'adType' => 'add_type',
+                'buildingType' => ['column' => 'building_type', 'transform' => fn($v) => Enum::check(PropertyType::class, $v)],
+                'roomCount' => 'number_of_rooms',
+                'cityId' => 'city_id',
+                'townId' => 'town_id',
+                'subwayId' => 'subway_id',
+                'districtId' => 'district_id',
+                'adNo' => 'add_no',
+                'address' => 'address',
+                'numberOfFloors' => 'number_of_floors',
+                'floorLocated' => 'floor_located',
+                'inCredit' => 'in_credit',
+                'hasVideo' => 'has_video',
+            ];
+
+            foreach ($filters as $param => $config) {
+                if ($request->has($param)) {
+                    $column = is_array($config) ? $config['column'] : $config;
+                    $value = $request->query($param);
+                    if (is_array($config) && isset($config['transform'])) {
+                        $value = $config['transform']($value);
+                    }
+                    $query->where($column, $value);
+                }
+            }
+
+            foreach (['area', 'field_area'] as $rangeParam) {
+                $min = $request->input("$rangeParam.min");
+                $max = $request->input("$rangeParam.max");
+
+                if ($min !== null || $max !== null) {
+                    $query->whereBetween($rangeParam, [
+                        $min ?? 0,
+                        $max ?? PHP_INT_MAX
+                    ]);
+                }
+            }
+
+            $limit = $request->integer('limit', config('default.default_property_limit'));
+
+            $properties = $query->orderBy('created_at', 'desc')
+                ->paginate($limit)
+                ->appends($request->query());
+
+            return PropertyListResource::collection($properties);
         }
 
-        $limit = $request->integer('limit', config('default.default_property_limit'));
-        $properties = $query->orderBy('created_at', 'desc')->paginate($limit)->appends($request->query());
-        return PropertyListResource::collection($properties);
+        $propertyGroups = [];
+        foreach (PropertyType::cases() as $type) {
+            $groupQuery = Property::query()
+                ->with([
+                    'prices' => fn($q) => $q->select('price', 'currency', 'property_id', 'created_at')->orderBy('created_at', 'desc'),
+                    'firstImage' => fn($q) => $q->select('type', 'path', 'imageable_id', 'imageable_type'),
+                ])
+                ->where('building_type', $type->value)
+                ->limit(config('default.default_property_limit'));
+
+            $propertyGroups[$type->label()] = PropertyListResource::collection($groupQuery->get());
+        }
+
+        return response()->json(["data" => $propertyGroups]);
     }
 
 
@@ -220,7 +220,7 @@ class PropertyController extends Controller
 
             $propertyGroups[$type->label()] = PropertyListResource::collection($groupQuery->get());
         }
-        return response()->json(["data"=>$propertyGroups]);
+        return response()->json(["data" => $propertyGroups]);
     }
 
 }
