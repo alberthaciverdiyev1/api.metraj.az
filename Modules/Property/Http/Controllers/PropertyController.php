@@ -41,24 +41,24 @@ class PropertyController extends Controller
     public function list(Request $request)
     {
         $relations = $request->query('with', []);
-        $query = Property::query()->when($relations, fn($q) => $q->with($relations));
+        $limit = config('default.default_property_limit');
 
-        $query->with([
-            'prices' => function ($q) {
-                $q->select('price', 'currency', 'property_id', 'created_at')
-                    ->orderBy('created_at', 'desc');
-            },
-            'firstImage' => function ($q) {
-                $q->select('type', 'path', 'imageable_id', 'imageable_type');
-            }
-        ]);
+        $query = Property::query()
+            ->when($relations, fn($q) => $q->with($relations))
+            ->with([
+                'prices' => fn($q) => $q->select('price', 'currency', 'property_id', 'created_at')
+                    ->orderBy('created_at', 'desc'),
+                'firstImage' => fn($q) => $q->select('type', 'path', 'imageable_id', 'imageable_type')
+            ]);
 
         if (!empty($request->query())) {
             if ($request->has('priceMin')) {
-                $query->whereHas('prices', fn($q) => $q->where('price', '>=', (int)$request->query('priceMin')));
+                $query->whereHas('prices', fn($q) => $q->where('price', '>=', (int)$request->query('priceMin'))
+                );
             }
             if ($request->has('priceMax')) {
-                $query->whereHas('prices', fn($q) => $q->where('price', '<=', (int)$request->query('priceMax')));
+                $query->whereHas('prices', fn($q) => $q->where('price', '<=', (int)$request->query('priceMax'))
+                );
             }
 
             $filters = [
@@ -101,31 +101,52 @@ class PropertyController extends Controller
                 }
             }
 
-            $limit = $request->integer('limit', config('default.default_property_limit'));
+            $limit = $request->integer('limit', $limit);
 
-            $properties = $query->orderBy('created_at', 'desc')
+            $properties = $query->orderBy('updated_at', 'desc')
                 ->paginate($limit)
                 ->appends($request->query());
 
             return PropertyListResource::collection($properties);
         }
 
-        $propertyGroups = [];
-        foreach (PropertyType::cases() as $type) {
-            $groupQuery = Property::query()
-                ->with([
-                    'prices' => fn($q) => $q->select('price', 'currency', 'property_id', 'created_at')->orderBy('created_at', 'desc'),
-                    'firstImage' => fn($q) => $q->select('type', 'path', 'imageable_id', 'imageable_type'),
-                ])
-                ->where('building_type', $type->value)
-                ->limit(config('default.default_property_limit'));
+        $types = PropertyType::cases();
+        $perTypeLimit = ceil($limit / count($types));
 
-            $propertyGroups[$type->label()] = PropertyListResource::collection($groupQuery->get());
+        $propertyGroups = [];
+
+        foreach ($types as $type) {
+            $baseQuery = Property::query()
+                ->with([
+                    'prices' => fn($q) => $q->select('price', 'currency', 'property_id', 'created_at')
+                        ->orderBy('created_at', 'desc'),
+                    'firstImage' => fn($q) => $q->select('type', 'path', 'imageable_id', 'imageable_type')
+                ])
+                ->where('building_type', $type->value);
+
+            $premium = (clone $baseQuery)
+                ->where('is_premium', true)
+                ->limit($perTypeLimit)
+                ->get();
+
+            $count = $premium->count();
+
+            if ($count < $perTypeLimit) {
+                $nonPremium = (clone $baseQuery)
+                    ->where('is_premium', false)
+                    ->limit($perTypeLimit - $count)
+                    ->get();
+
+                $all = $premium->merge($nonPremium);
+            } else {
+                $all = $premium;
+            }
+
+            $propertyGroups[$type->label()] = PropertyListResource::collection($all);
         }
 
-        return response()->json(["data" => $propertyGroups]);
+        return response()->json(['data' => $propertyGroups]);
     }
-
 
     public function details($id)
     {

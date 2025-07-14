@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'default_property_limit' => 10
+    'default_property_limit' => 30
 ];
