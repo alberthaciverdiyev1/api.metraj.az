@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Modules\Property\Http\Controllers\PropertyController;
+use Modules\User\Http\Controllers\FavoriteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,12 +15,18 @@ use Modules\Property\Http\Controllers\PropertyController;
 |
 */
 
-Route::get('property', [\Modules\Property\Http\Controllers\PropertyController::class, 'list']);
+Route::get('property', [PropertyController::class, 'list']);
 Route::get('property/{id}', [PropertyController::class, 'details']);
 Route::post('property', [PropertyController::class, 'add']);
 
 Route::get('agency-property/{id}', [PropertyController::class, 'agencyProperties']);
 
+
+Route::controller(FavoriteController::class)->prefix('favorite')->group(function () {
+    Route::get('/', 'index')->name('favorite.list');
+    Route::post('/', 'store')->name('favorite.store');
+    Route::delete('/{property_id}', 'destroy')->name('favorite.destroy');
+});
 
 
 //Route::middleware('auth:api')->group(function () {
