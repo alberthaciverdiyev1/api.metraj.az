@@ -43,6 +43,8 @@ return new class extends Migration
             $table->string('google_map_location')->nullable();
             $table->boolean('is_active')->default(true);
             $table->boolean('is_premium')->default(false);
+            $table->boolean('is_move_forward')->default(false);
+            $table->integer('move_forward_count')->default(0);
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();

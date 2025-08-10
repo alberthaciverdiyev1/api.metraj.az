@@ -133,7 +133,7 @@ class DatabaseSeeder extends Seeder
         Blog::factory()->count(50)->create();
         Nearby::factory()->count(99)->create();
 
-        $properties = Property::factory(100)->create();
+        $properties = Property::factory(1000)->create();
 
         $properties->each(function ($property) use ($mediaData) {
 

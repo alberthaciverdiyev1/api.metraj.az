@@ -18,7 +18,7 @@ class UserController extends Controller
 {
     public function register(RegisterRequest $request)
     {
-        $validated = $request->safe();
+        $validated = $request->validated();
 
         $user = User::create([
             'name'     => $validated['name'],
@@ -26,35 +26,40 @@ class UserController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        $token = JWTAuth::fromUser($user);
+        $token = auth('api')->login($user);
 
         return response()->json([
             'status' => 201,
             'message' => 'Registration successful',
             'token' => $token,
-            'user' => $user
-        ]);
+            'token_type' => 'bearer',
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
+            'user' => $user,
+        ], 201);
     }
 
     public function login(LoginRequest $request)
     {
-
         $credentials = $request->only('email', 'password');
 
-        if (!$token = JWTAuth::attempt($credentials)) {
-            return response()->json(['status' => 401, 'message' => 'Email or Password is invalid']);
+        if (!$token = auth('api')->attempt($credentials)) {
+            return response()->json([
+                'status' => 401,
+                'message' => 'Email or Password is invalid',
+            ], 401);
         }
 
-        $user = auth()->user();
+        $user = auth('api')->user();
 
         return response()->json([
             'status' => 200,
             'message' => 'Login successful',
             'token' => $token,
-            'user' => $user
+            'token_type' => 'bearer',
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
+            'user' => $user,
         ]);
     }
-
     public function update(Request $request)
     {
         $user = auth()->user();

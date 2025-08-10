@@ -5,6 +5,9 @@ namespace Modules\Property\Http\Transformers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
+use Modules\Base\Enums\PropertyType;
+use Modules\Base\Enums\RepairType;
+use Modules\Base\Helpers\Enum;
 use Modules\Media\Http\Transformers\MediaResource;
 use Modules\Price\Http\Transformers\PriceResource;
 
@@ -21,6 +24,7 @@ class PropertyListResource extends JsonResource
             'date' => \Carbon\Carbon::parse($this->getAttribute('date'))->format('d F, Y'),
             'title' => $this->number_of_rooms .' otaqlı '. $this->subway->name ?? $this->district->name,
             'address' => $this->getAttribute('address'),
+            'buildingType' => Enum::resolve(PropertyType::class,$this->building_type),
             'beds' => 4,
             'baths' => 3,
             'area' => $this->getAttribute('area'),

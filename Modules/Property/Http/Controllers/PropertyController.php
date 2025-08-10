@@ -3,9 +3,11 @@
 namespace Modules\Property\Http\Controllers;
 
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Modules\Base\Enums\Currency;
 use Modules\Base\Enums\PropertyType;
@@ -40,6 +42,7 @@ class PropertyController extends Controller
      */
     public function list(Request $request)
     {
+        // dd($request->query());
         $relations = $request->query('with', []);
         $limit = config('default.default_property_limit');
 
@@ -52,6 +55,7 @@ class PropertyController extends Controller
             ]);
 
         if (!empty($request->query())) {
+
             if ($request->has('priceMin')) {
                 $query->whereHas('prices', fn($q) => $q->where('price', '>=', (int)$request->query('priceMin'))
                 );
@@ -89,9 +93,9 @@ class PropertyController extends Controller
                 }
             }
 
-            foreach (['area', 'field_area'] as $rangeParam) {
-                $min = $request->input("$rangeParam.min");
-                $max = $request->input("$rangeParam.max");
+            foreach (['area', 'fieldArea'] as $rangeParam) {
+                $min = $request->input("$rangeParam.Min");
+                $max = $request->input("$rangeParam.Max");
 
                 if ($min !== null || $max !== null) {
                     $query->whereBetween($rangeParam, [
@@ -202,6 +206,11 @@ class PropertyController extends Controller
         //  $property->features()->sync([1, 2, 3]);
 
     }
+    public function delete($id)
+    {
+        //  $property->features()->sync([1, 2, 3]);
+
+    }
 
     public function agencyProperties(Request $request, int $agencyId)
     {
@@ -242,6 +251,33 @@ class PropertyController extends Controller
             $propertyGroups[$type->label()] = PropertyListResource::collection($groupQuery->get());
         }
         return response()->json(["data" => $propertyGroups]);
+    }
+
+
+    public function makePremium(int $propertyId): JsonResponse
+    {
+        Property::query()->where('id', $propertyId)->update(['is_premium' => true]);
+        return response()->json([
+            "message" => "Property is premium now!",
+            "data" => true]);
+    }
+
+    public function moveForward(int $propertyId): JsonResponse
+    {
+        Property::query()
+            ->where('id', $propertyId)
+            ->where('move_forward_count', '>', 0)
+            ->update([
+                'is_premium' => false,
+                'is_move_forward' => true,
+                'move_forward_count' => DB::raw('move_forward_count - 1'),
+                'updated_at' => now()
+            ]);
+
+        return response()->json([
+                "message" => "Property Move Forward Moved Successfully",
+                "data" => true]
+        );
     }
 
 }

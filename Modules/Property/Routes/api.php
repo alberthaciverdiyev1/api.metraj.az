@@ -15,12 +15,19 @@ use Modules\User\Http\Controllers\FavoriteController;
 |
 */
 
-Route::get('property', [PropertyController::class, 'list']);
-Route::get('property/{id}', [PropertyController::class, 'details']);
-Route::post('property', [PropertyController::class, 'add']);
+
+Route::group(['prefix' => 'property'], function () {
+
+    Route::get('/', [PropertyController::class, 'list']);
+    Route::get('/{id}', [PropertyController::class, 'details']);
+    Route::post('/', [PropertyController::class, 'add']);
+    Route::put('/{id}', [PropertyController::class, 'update']);
+    Route::delete('/{id}', [PropertyController::class, 'delete']);
+    Route::put('/make-premium', [PropertyController::class, 'makePremium']);
+    Route::put('/make-move-forward', [PropertyController::class, 'moveForward']);
+});
 
 Route::get('agency-property/{id}', [PropertyController::class, 'agencyProperties']);
-
 
 Route::controller(FavoriteController::class)->prefix('favorite')->group(function () {
     Route::get('/', 'index')->name('favorite.list');
