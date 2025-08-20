@@ -69,30 +69,39 @@ class UserController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'name'     => 'sometimes|required|string|max:255',
-            'email'    => 'sometimes|required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|min:6|confirmed',
+            'name'              => 'sometimes|required|string|max:255',
+            'email'             => 'sometimes|required|email|unique:users,email,' . $user->id,
+            'phone_1'           => 'nullable|string|min:7|max:20',
+            'phone_2'           => 'nullable|string|min:7|max:20',
+            'address'           => 'nullable|string|max:255',
+            'short_description' => 'nullable|string|max:500',
+            'profile_image'     => 'nullable|url',
+            'background_image'  => 'nullable|url',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['status' => 422, 'errors' => $validator->errors()]);
         }
 
-        $user->fill($request->only('name', 'email'));
-
-        if ($request->filled('password')) {
-            $user->password = bcrypt($request->password);
-        }
+        $user->fill($request->only([
+            'name',
+            'email',
+            'phone_1',
+            'phone_2',
+            'address',
+            'short_description',
+            'profile_image',
+            'background_image'
+        ]));
 
         $user->save();
 
         return response()->json([
-            'status' => 200,
-            'message' => 'User updated',
-            'user' => $user
+            'status'  => 200,
+            'message' => 'User updated successfully',
+            'user'    => new \Modules\User\Http\Transformers\UserResource($user)
         ]);
     }
-
     public function forgetPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [

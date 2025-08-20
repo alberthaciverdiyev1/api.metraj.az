@@ -27,6 +27,8 @@ Route::middleware('auth:api')->group(function () {
     Route::get('test', function (Request $request) {
         return auth()->user();
     });
+    Route::put('user/update', [\Modules\User\Http\Controllers\UserController::class, 'update']);
+    Route::get('user/me', [\Modules\User\Http\Controllers\UserController::class, 'me']);
 
 });
 
