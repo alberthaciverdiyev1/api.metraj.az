@@ -72,6 +72,7 @@ class UserController extends Controller
             'name'     => 'sometimes|required|string|max:255',
             'email'    => 'sometimes|required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:6|confirmed',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -82,6 +83,19 @@ class UserController extends Controller
 
         if ($request->filled('password')) {
             $user->password = bcrypt($request->password);
+        }
+
+        if ($request->hasFile('profile_image')) {
+            $file = $request->file('profile_image');
+
+            if ($user->profile_image && file_exists(public_path('uploads/profile_images/' . $user->profile_image))) {
+                unlink(public_path('uploads/profile_images/' . $user->profile_image));
+            }
+
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/profile_images'), $filename);
+
+            $user->profile_image = $filename;
         }
 
         $user->save();
