@@ -106,6 +106,46 @@ class UserController extends Controller
             'user'    => new \Modules\User\Http\Transformers\UserResource($user)
         ]);
     }
+
+
+    public function updateBanner(Request $request)
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
+        }
+
+        if (!$user->is_agency) {
+            return response()->json(['status' => 403, 'message' => 'Only agents can update banner'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'background_image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 422, 'errors' => $validator->errors()], 422);
+        }
+
+        if ($user->background_image && file_exists(public_path('uploads/banner_images/' . $user->background_image))) {
+            unlink(public_path('uploads/banner_images/' . $user->background_image));
+        }
+
+        $file = $request->file('background_image');
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('uploads/banner_images'), $filename);
+
+        $user->background_image = $filename;
+        $user->save();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Banner updated successfully',
+            'user' => $user
+        ]);
+    }
+
     public function forgetPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
