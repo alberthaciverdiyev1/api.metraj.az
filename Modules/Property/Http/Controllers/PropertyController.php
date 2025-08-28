@@ -171,6 +171,48 @@ class PropertyController extends Controller
             ->firstOrFail();
         return new PropertyDetailsResource($property);
     }
+    public function delete($id)
+    {
+        $property = Property::findOrFail($id);
+
+        if ($property->user_id !== auth()->id()) {
+            return response()->json([
+                'message' => 'Siz bu elanı silə bilməzsiniz.'
+            ], 403);
+        }
+
+        $property->delete();
+
+        return response()->json([
+            'message' => 'Elan uğurla silindi.'
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $property = Property::findOrFail($id);
+
+        if ($property->user_id !== auth()->id()) {
+            return response()->json([
+                'message' => 'Siz bu elanı redaktə edə bilməzsiniz.'
+            ], 403);
+        }
+
+        if ($property->update_count >= config('property.update_count')) {
+            return response()->json([
+                'message' => 'Maksimum redaktə sayına çatmısınız.'
+            ], 403);
+        }
+
+        $property->update($request->all());
+
+        $property->increment('update_count');
+
+        return response()->json([
+            'message' => 'Elan uğurla redaktə olundu.',
+            'data' => new PropertyDetailsResource($property)
+        ]);
+    }
 
     public function add(StoreProperty $request)
     {
@@ -201,16 +243,6 @@ class PropertyController extends Controller
         return new PropertyDetailsResource($property);
     }
 
-    public function update()
-    {
-        //  $property->features()->sync([1, 2, 3]);
-
-    }
-    public function delete($id)
-    {
-        //  $property->features()->sync([1, 2, 3]);
-
-    }
 
     public function agencyProperties(Request $request, int $agencyId)
     {
