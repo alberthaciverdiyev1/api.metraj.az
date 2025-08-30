@@ -48,12 +48,15 @@ class KeywordController extends Controller
     public function store(Request $request)
     {
         try {
+            $data = $request->only((new Keyword())->getFillable());
+            $keyword = Keyword::create($data);
 
-            //TODO:STORE FUNCTIONS
-
-            return response()->json(__('Data successfully created!'));
+            return response()->json([
+                'message' => 'Keyword successfully created!',
+                'keyword' => $keyword
+            ]);
         } catch (Exception $e) {
-            return response()->json($e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -79,12 +82,15 @@ class KeywordController extends Controller
     public function update(Request $request)
     {
         try {
+            $keyword = Keyword::findOrFail($id);
+            $keyword->update($request->only($keyword->getFillable()));
 
-            //TODO:UPDATE FUNCTIONS
-
-            return response()->json(__('Data successfully updated!'));
+            return response()->json([
+                'message' => 'Keyword successfully updated!',
+                'keyword' => $keyword
+            ]);
         } catch (Exception $e) {
-            return response()->json($e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -94,12 +100,12 @@ class KeywordController extends Controller
     public function destroy()
     {
         try {
+            $keyword = Keyword::findOrFail($id);
+            $keyword->delete();
 
-            //TODO:DESTROY FUNCTIONS
-
-            return response()->json(__('Data successfully deleted!'));
+            return response()->json(['message' => 'Keyword successfully deleted!']);
         } catch (Exception $e) {
-            return response()->json($e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 }

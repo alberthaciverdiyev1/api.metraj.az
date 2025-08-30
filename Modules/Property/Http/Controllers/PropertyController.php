@@ -20,6 +20,7 @@ use Modules\Property\Http\Transformers\PropertyDetailsResource;
 use Modules\Property\Http\Transformers\PropertyListResource;
 use Nwidart\Modules\Facades\Module;
 use Modules\Property\Http\Entities\Property;
+use Modules\Keyword\Http\Entities\Keyword;
 
 class PropertyController extends Controller
 {
@@ -35,7 +36,53 @@ class PropertyController extends Controller
 //            $this->middleware('permission:destroy property')->only('destroy');
 //        }
     }
+    public function byKeyword(Request $request, $id)
+    {
+        $keyword = Keyword::findOrFail($id);
 
+        $query = Property::query()
+            ->with([
+                'prices' => fn($q) => $q->select('price', 'currency', 'property_id', 'created_at')->orderBy('created_at', 'desc'),
+                'firstImage' => fn($q) => $q->select('type', 'path', 'imageable_id', 'imageable_type')
+            ]);
+
+        if ($keyword->city_id) {
+            $query->where('city_id', $keyword->city_id);
+        }
+        if ($keyword->district_id) {
+            $query->where('district_id', $keyword->district_id);
+        }
+        if ($keyword->town_id) {
+            $query->where('town_id', $keyword->town_id);
+        }
+        if ($keyword->subway_id) {
+            $query->where('subway_id', $keyword->subway_id);
+        }
+        if ($keyword->number_of_rooms) {
+            $query->where('number_of_rooms', $keyword->number_of_rooms);
+        }
+        if ($keyword->number_of_floors) {
+            $query->where('number_of_floors', $keyword->number_of_floors);
+        }
+        if ($keyword->in_credit) {
+            $query->where('in_credit', true);
+        }
+        if ($keyword->document) {
+            $query->where('document', true);
+        }
+        if ($keyword->ad_type) {
+            $query->where('add_type', $keyword->ad_type);
+        }
+        if ($keyword->property_type) {
+            $query->where('building_type', $keyword->property_type);
+        }
+
+        $limit = $request->integer('limit', config('default.default_property_limit'));
+
+        $properties = $query->orderBy('updated_at', 'desc')->paginate($limit);
+
+        return PropertyListResource::collection($properties);
+    }
 
     /**
      * Display a listing of the resource.
