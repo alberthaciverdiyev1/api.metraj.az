@@ -9,14 +9,21 @@ use Modules\User\Http\Entities\User;
 
 class AgencyController extends Controller
 {
-    public function index(Request $request)
-    {
-        $agencies = User::query()
-            ->where('is_agency', '=', 1)
-            ->orderByDesc('is_premium')
-            ->get();
-        return UserResource::collection($agencies);
+ public function index(Request $request)
+{
+    $query = User::query()
+        ->where('is_agency', '=', 1);
+
+    if ($request->has('search') && !empty($request->search)) {
+        $search = $request->search;
+        $query->where('name', 'LIKE', "%{$search}%");
     }
+
+    $agencies = $query->orderByDesc('is_premium')->get();
+
+    return UserResource::collection($agencies);
+}
+
 
     public function details($id)
     {
