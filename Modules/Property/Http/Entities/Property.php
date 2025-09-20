@@ -34,6 +34,7 @@ class Property extends Model
         'district_id',
         'city_id',
         'address',
+            'rent_type',
         'add_type',
         'property_condition',
         'number_of_floors',

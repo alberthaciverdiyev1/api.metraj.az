@@ -264,6 +264,9 @@ class PropertyController extends Controller
     public function add(StoreProperty $request)
     {
         $validated = $request->validated();
+        if (!empty($validated['rent'])) {
+            $validated['rent_type'] = $request->input('rent_type'); // daily / monthly
+        }
 
         $validated['property_condition'] = Enum::check(RepairType::class, $validated['property_condition']);
         $validated['building_type'] = Enum::check(PropertyType::class, $validated['building_type']);

@@ -47,6 +47,7 @@ class StoreProperty extends FormRequest
             'price' => 'required|integer|min:0',
             'media' => 'required|array',
             'features' => 'nullable|array',
+              'rent_type' => 'required_if:rent,1|in:daily,monthly',
             'features.*' => 'nullable|exists:features,id',
             'nearby_objects' => 'nullable|array',
             'nearby_objects.*' => 'nullable|exists:nearby_objects,id',

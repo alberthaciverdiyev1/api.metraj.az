@@ -48,6 +48,8 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
+            $table->enum('rent_type', ['daily', 'monthly'])->nullable()->after('rent');
+
         });
     }
 
