@@ -51,14 +51,14 @@ class Property extends Model
         'mail',
         'description',
         'in_credit',
-        'document',
         'note_to_admin',
         'building_type',
         'has_video',
-        'google_map_location',
         'is_active',
         'is_premium',
         'user_id',
+        'has_deed',
+
     ];
 
     /**
