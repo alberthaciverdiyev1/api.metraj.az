@@ -218,48 +218,67 @@ class PropertyController extends Controller
             ->firstOrFail();
         return new PropertyDetailsResource($property);
     }
-    public function delete($id)
-    {
-        $property = Property::findOrFail($id);
+   public function delete($id)
+{
+    $property = Property::findOrFail($id);
 
-        if ($property->user_id !== auth()->id()) {
-            return response()->json([
-                'message' => 'Siz bu elanı silə bilməzsiniz.'
-            ], 403);
-        }
-
-        $property->delete();
-
+    if ($property->user_id !== auth()->id()) {
         return response()->json([
-            'message' => 'Elan uğurla silindi.'
+            'status' => 'error',
+            'message' => 'Siz bu elanı silə bilməzsiniz.',
+            'data' => null
+        ], 403);
+    }
+
+    $property->delete();
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Elan uğurla silindi.',
+        'data' => null
+    ], 200);
+}
+
+
+  public function update(Request $request, $id)
+{
+    $property = Property::findOrFail($id);
+
+    if ($property->user_id !== auth()->id()) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Siz bu elanı redaktə edə bilməzsiniz.',
+            'data' => null
+        ], 403);
+    }
+
+    if ($property->update_count >= config('property.update_count')) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Maksimum redaktə sayına çatmısınız.',
+            'data' => null
+        ], 403);
+    }
+
+    $property->update($request->all());
+
+    if ($request->has('price')) {
+        Price::create([
+            'property_id' => $property->id,
+            'price' => $request->input('price'),
+            'currency' => Enum::check(Currency::class, 'AZN'),
         ]);
     }
 
-    public function update(Request $request, $id)
-    {
-        $property = Property::findOrFail($id);
+    $property->increment('update_count');
 
-        if ($property->user_id !== auth()->id()) {
-            return response()->json([
-                'message' => 'Siz bu elanı redaktə edə bilməzsiniz.'
-            ], 403);
-        }
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Elan uğurla redaktə olundu.',
+        'data' => new PropertyDetailsResource($property->fresh())
+    ], 200);
+}
 
-        if ($property->update_count >= config('property.update_count')) {
-            return response()->json([
-                'message' => 'Maksimum redaktə sayına çatmısınız.'
-            ], 403);
-        }
-
-        $property->update($request->all());
-
-        $property->increment('update_count');
-
-        return response()->json([
-            'message' => 'Elan uğurla redaktə olundu.',
-            'data' => new PropertyDetailsResource($property)
-        ]);
-    }
 
     public function add(StoreProperty $request)
     {
