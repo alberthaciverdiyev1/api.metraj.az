@@ -21,10 +21,16 @@ class PropertyListResource extends JsonResource
         return [
             'id' => $this->getAttribute('id'),
             'slug' => $this->getAttribute('slug'),
-            'date' => \Carbon\Carbon::parse($this->getAttribute('date'))->format('d F, Y'),
+            'date' => (\Carbon\Carbon::parse($this->getAttribute('updated_at'))->isToday())
+            ? 'Bugün ' . \Carbon\Carbon::parse($this->getAttribute('updated_at'))->format('H:i')
+            : \Carbon\Carbon::parse($this->getAttribute('updated_at'))->format('d.m.Y'),
+
+
             'title' => $this->number_of_rooms .' otaqlı '. $this->subway->name ?? $this->district->name,
             'address' => $this->getAttribute('address'),
             'buildingType' => Enum::resolve(PropertyType::class,$this->building_type),
+            'property_condition' => Enum::resolve(RepairType::class,$this->property_condition),
+            //'has_'=>""
             'beds' => 4,
             'baths' => 3,
             'area' => $this->getAttribute('area'),

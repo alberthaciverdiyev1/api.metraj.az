@@ -26,7 +26,8 @@ class AgencyController extends Controller
 
     function makePremium(int $id)
     {
-        $agency = User::query()->where('id', '=', $id)->where('is_premium', '=', 1)->first();
+        $agency = User::query()->where('id', $id)->where('is_agency',true)->update(['is_premium' => true]);
+
         return new UserResource($agency);
     }
 
