@@ -26,6 +26,11 @@ Route::group(['prefix' => 'property'], function () {
     Route::put('/make-premium', [PropertyController::class, 'makePremium']);
     Route::put('/make-move-forward', [PropertyController::class, 'moveForward']);
 });
+Route::middleware('auth:api')->group(function () {
+    Route::put('property/{id}', [PropertyController::class, 'update']);
+    Route::delete('property/{id}', [PropertyController::class, 'delete']);
+});
+Route::get('/keywords/{id}/properties', [PropertyController::class, 'byKeyword']);
 
 Route::get('agency-property/{id}', [PropertyController::class, 'agencyProperties']);
 

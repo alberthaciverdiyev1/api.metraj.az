@@ -20,6 +20,7 @@ use Modules\Property\Http\Transformers\PropertyDetailsResource;
 use Modules\Property\Http\Transformers\PropertyListResource;
 use Nwidart\Modules\Facades\Module;
 use Modules\Property\Http\Entities\Property;
+use Modules\Keyword\Http\Entities\Keyword;
 
 class PropertyController extends Controller
 {
@@ -35,7 +36,53 @@ class PropertyController extends Controller
 //            $this->middleware('permission:destroy property')->only('destroy');
 //        }
     }
+    public function byKeyword(Request $request, $id)
+    {
+        $keyword = Keyword::findOrFail($id);
 
+        $query = Property::query()
+            ->with([
+                'prices' => fn($q) => $q->select('price', 'currency', 'property_id', 'created_at')->orderBy('created_at', 'desc'),
+                'firstImage' => fn($q) => $q->select('type', 'path', 'imageable_id', 'imageable_type')
+            ]);
+
+        if ($keyword->city_id) {
+            $query->where('city_id', $keyword->city_id);
+        }
+        if ($keyword->district_id) {
+            $query->where('district_id', $keyword->district_id);
+        }
+        if ($keyword->town_id) {
+            $query->where('town_id', $keyword->town_id);
+        }
+        if ($keyword->subway_id) {
+            $query->where('subway_id', $keyword->subway_id);
+        }
+        if ($keyword->number_of_rooms) {
+            $query->where('number_of_rooms', $keyword->number_of_rooms);
+        }
+        if ($keyword->number_of_floors) {
+            $query->where('number_of_floors', $keyword->number_of_floors);
+        }
+        if ($keyword->in_credit) {
+            $query->where('in_credit', true);
+        }
+        if ($keyword->document) {
+            $query->where('document', true);
+        }
+        if ($keyword->ad_type) {
+            $query->where('add_type', $keyword->ad_type);
+        }
+        if ($keyword->property_type) {
+            $query->where('building_type', $keyword->property_type);
+        }
+
+        $limit = $request->integer('limit', config('default.default_property_limit'));
+
+        $properties = $query->orderBy('updated_at', 'desc')->paginate($limit);
+
+        return PropertyListResource::collection($properties);
+    }
 
     /**
      * Display a listing of the resource.
@@ -158,10 +205,74 @@ class PropertyController extends Controller
             ->firstOrFail();
         return new PropertyDetailsResource($property);
     }
+   public function delete($id)
+{
+    $property = Property::findOrFail($id);
+
+    if ($property->user_id !== auth()->id()) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Siz bu elanı silə bilməzsiniz.',
+            'data' => null
+        ], 403);
+    }
+
+    $property->delete();
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Elan uğurla silindi.',
+        'data' => null
+    ], 200);
+}
+
+
+  public function update(Request $request, $id)
+{
+    $property = Property::findOrFail($id);
+
+    if ($property->user_id !== auth()->id()) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Siz bu elanı redaktə edə bilməzsiniz.',
+            'data' => null
+        ], 403);
+    }
+
+    if ($property->update_count >= config('property.update_count')) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Maksimum redaktə sayına çatmısınız.',
+            'data' => null
+        ], 403);
+    }
+
+    $property->update($request->all());
+
+    if ($request->has('price')) {
+        Price::create([
+            'property_id' => $property->id,
+            'price' => $request->input('price'),
+            'currency' => Enum::check(Currency::class, 'AZN'),
+        ]);
+    }
+
+    $property->increment('update_count');
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Elan uğurla redaktə olundu.',
+        'data' => new PropertyDetailsResource($property->fresh())
+    ], 200);
+}
+
 
     public function add(StoreProperty $request)
     {
         $validated = $request->validated();
+        if (!empty($validated['rent'])) {
+            $validated['rent_type'] = $request->input('rent_type'); // daily / monthly
+        }
 
         $validated['property_condition'] = Enum::check(RepairType::class, $validated['property_condition']);
         $validated['building_type'] = Enum::check(PropertyType::class, $validated['building_type']);
@@ -188,16 +299,6 @@ class PropertyController extends Controller
         return new PropertyDetailsResource($property);
     }
 
-    public function update()
-    {
-        //  $property->features()->sync([1, 2, 3]);
-
-    }
-    public function delete($id)
-    {
-        //  $property->features()->sync([1, 2, 3]);
-
-    }
 
     public function agencyProperties(Request $request, int $agencyId)
     {

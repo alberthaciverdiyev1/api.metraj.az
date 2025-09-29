@@ -36,10 +36,8 @@ class StoreProperty extends FormRequest
             'mail' => 'required|email|max:255',
             'description' => 'required|string',
             'in_credit' => 'nullable|boolean',
-            'document' => 'nullable|string|max:255',
             'note_to_admin' => 'nullable|string',
             'has_video' => 'nullable|boolean',
-            'google_map_location' => 'nullable|string|max:255',
             'is_active' => 'nullable|boolean',
             'is_premium' => 'nullable|boolean',
             'user_id' => 'nullable|exists:users,id',
@@ -47,7 +45,10 @@ class StoreProperty extends FormRequest
             'price' => 'required|integer|min:0',
             'media' => 'required|array',
             'features' => 'nullable|array',
+              'rent_type' => 'required_if:rent,1|in:daily,monthly',
             'features.*' => 'nullable|exists:features,id',
+            'has_deed' => 'boolean',
+
             'nearby_objects' => 'nullable|array',
             'nearby_objects.*' => 'nullable|exists:nearby_objects,id',
         ];

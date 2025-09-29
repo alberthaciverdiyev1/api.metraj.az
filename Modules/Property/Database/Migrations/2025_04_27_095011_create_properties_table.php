@@ -36,18 +36,20 @@ return new class extends Migration
             $table->string('mail')->nullable();
             $table->text('description')->nullable();
             $table->boolean('in_credit')->default(false);
-            $table->string('document')->nullable();
             $table->text('note_to_admin')->nullable();
             $table->string('building_type')->nullable();
             $table->boolean('has_video')->default(false);
-            $table->string('google_map_location')->nullable();
             $table->boolean('is_active')->default(true);
             $table->boolean('is_premium')->default(false);
             $table->boolean('is_move_forward')->default(false);
             $table->integer('move_forward_count')->default(0);
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
+            $table->boolean('has_deed')->default(false);
+
             $table->softDeletes();
+            $table->enum('rent_type', ['daily', 'monthly'])->nullable()->after('rent');
+
         });
     }
 
