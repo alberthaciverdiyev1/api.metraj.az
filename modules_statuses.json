@@ -14,5 +14,6 @@
     "Setting": true,
     "Blog": true,
     "Nearby": true,
-    "Contact": true
+    "Contact": true,
+    "Ad": true
 }
