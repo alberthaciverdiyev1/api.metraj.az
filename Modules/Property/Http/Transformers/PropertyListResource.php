@@ -26,7 +26,9 @@ class PropertyListResource extends JsonResource
             : \Carbon\Carbon::parse($this->getAttribute('updated_at'))->format('d.m.Y'),
 
 
-            'title' => $this->number_of_rooms .' otaqlı '. $this->subway->name ?? $this->district->name,
+           // 'title' => $this->number_of_rooms .' otaqlı '. $this->subway->name ?? $this->district->name,
+            'sm_title' => $this->number_of_rooms .' otaqlı · '. $this->getAttribute('area').' m²',
+            'title' => $this->number_of_rooms .' otaqlı · '. $this->getAttribute('area').' m² · '. ($this->subway->name ? $this->subway->name .' m.': $this->district->name),
             'address' => $this->getAttribute('address'),
             'buildingType' => Enum::resolve(PropertyType::class,$this->building_type),
             'property_condition' => Enum::resolve(RepairType::class,$this->property_condition),

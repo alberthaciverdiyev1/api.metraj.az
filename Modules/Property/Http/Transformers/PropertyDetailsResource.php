@@ -34,12 +34,12 @@ class PropertyDetailsResource extends JsonResource
             'area' => $this->area,
             'field_area'=> $this->field_area,
             'media' => [
-                'images' => MediaResource::collection($this->media->where('type', 'image')) ?? null,
-                'video'  => MediaResource::collection($this->media->where('type', 'video')) ?? null,
-                'document'  => MediaResource::collection($this->media->where('type', 'document'))  ?? null,
+                'images' => MediaResource::collection($this->media->where('type', 'image')),
+                'video'  => MediaResource::collection($this->media->where('type', 'video')),
             ],
 
             'property_condition' => Enum::resolve(RepairType::class,$this->property_condition),
+            'add_type_rent' => (boolean)($this->add_type === 'rent'),
 
             'add_type' => $this->add_type,
             'number_of_floors' => $this->number_of_floors,
