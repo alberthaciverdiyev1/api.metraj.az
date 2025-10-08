@@ -5,6 +5,8 @@ namespace Modules\Media\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Validator;
+use Modules\Media\Http\Services\MediaService;
 use Nwidart\Modules\Facades\Module;
 
 class MediaController extends Controller
@@ -45,12 +47,37 @@ class MediaController extends Controller
     public function store(Request $request)
     {
         try {
+            $validator = Validator::make($request->all(), [
+                'type' => 'required|string|in:image,video,document',
+                'path' => 'required|url|max:500',
+                'imageable_type' => 'required|string',
+                'imageable_id' => 'required|integer',
+            ]);
 
-            //TODO:STORE FUNCTIONS
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 422,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
 
-            return response()->json(__('Data successfully created!'));
+            $media = MediaService::storeFromUrl(
+                $request->type,
+                $request->path,
+                $request->imageable_type,
+                $request->imageable_id
+            );
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Media created successfully',
+                'data' => $media
+            ]);
         } catch (Exception $e) {
-            return response()->json($e->getMessage());
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -68,6 +95,46 @@ class MediaController extends Controller
     public function edit()
     {
         return view('media::edit');
+    }
+
+    /**
+     * Upload media via URL (instead of file upload)
+     */
+    public function uploadUrl(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'type' => 'required|string|in:image,video,document',
+                'url' => 'required|url|max:500',
+                'imageable_type' => 'required|string',
+                'imageable_id' => 'required|integer',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 422,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $media = MediaService::storeFromUrl(
+                $request->type,
+                $request->url,
+                $request->imageable_type,
+                $request->imageable_id
+            );
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Media uploaded successfully',
+                'data' => $media
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

@@ -44,6 +44,8 @@ class StoreProperty extends FormRequest
             'realtor_id' => 'nullable|exists:users,id',
             'price' => 'required|integer|min:0',
             'media' => 'required|array',
+            'media.*.type' => 'required|string|in:image,video,document',
+            'media.*.path' => 'required|url|max:500',
             'features' => 'nullable|array',
               'rent_type' => 'required_if:rent,1|in:daily,monthly',
             'features.*' => 'nullable|exists:features,id',

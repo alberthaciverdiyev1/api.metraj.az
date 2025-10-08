@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('FILESYSTEM_DISK', 'local'),
+    'default' => env('FILESYSTEM_DISK', 'url'), // Changed to URL-based storage
 
     /*
     |--------------------------------------------------------------------------
@@ -29,6 +29,11 @@ return [
     */
 
     'disks' => [
+
+        'url' => [
+            'driver' => 'url',
+            'description' => 'URL-based media storage - no local files stored',
+        ],
 
         'local' => [
             'driver' => 'local',

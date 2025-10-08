@@ -16,5 +16,6 @@ use Illuminate\Http\Request;
 
 Route::middleware('auth:api')->group(function () {
     Route::resource('/media', \Modules\Media\Http\Controllers\MediaController::class);
+    Route::post('/media/upload-url', [\Modules\Media\Http\Controllers\MediaController::class, 'uploadUrl']);
 });
 

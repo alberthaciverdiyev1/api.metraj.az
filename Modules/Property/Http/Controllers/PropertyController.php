@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Modules\Base\Enums\Currency;
 use Modules\Base\Enums\PropertyType;
 use Modules\Base\Helpers\Enum;
+use Modules\Media\Http\Services\MediaService;
 use Modules\Price\Http\Entities\Price;
 use Symfony\Component\HttpFoundation\Response;
 use Modules\Base\Enums\RepairType;
@@ -305,7 +306,10 @@ class PropertyController extends Controller
             'price' => $price,
             'currency' => Enum::check(Currency::class, 'AZN'),
         ]);
-        $property->media()->createMany($media);
+        // Store media using URL-based approach
+        if (!empty($media)) {
+            MediaService::storeMultipleFromUrls($media, Property::class, $property->id);
+        }
         $property->features()->attach($features);
         $property->nearbyObjects()->attach($nearby_objects);
 

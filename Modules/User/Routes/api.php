@@ -29,7 +29,7 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::put('user/update', [\Modules\User\Http\Controllers\UserController::class, 'update']);
     Route::get('user/me', [\Modules\User\Http\Controllers\UserController::class, 'me']);
-
+    Route::put('user/update-banner', [\Modules\User\Http\Controllers\UserController::class, 'updateBanner']);
 });
 
 Route::get('agency/{id}', [\Modules\User\Http\Controllers\AgencyController::class, 'details']);
